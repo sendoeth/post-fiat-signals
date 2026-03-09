@@ -121,7 +121,7 @@ import os
 client = RegimeClient(base_url=os.environ.get("PF_API_URL", "http://localhost:8080"))
 
 # Direct
-client = RegimeClient(base_url="http://192.168.1.100:8080")
+client = RegimeClient(base_url="http://your-node:8080")
 ```
 
 ## License
