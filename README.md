@@ -4,6 +4,8 @@ Python SDK for the Post Fiat Signal Intelligence API. Connects to a regime-aware
 
 Zero external dependencies. Python 3.10+.
 
+> **New here?** Read [PRODUCT.md](PRODUCT.md) for the full value proposition, core use case walkthrough, and component architecture before diving into the technical docs below.
+
 ## Install
 
 ```bash
