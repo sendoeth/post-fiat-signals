@@ -4,7 +4,7 @@ Python SDK for the Post Fiat Signal Intelligence API. Connects to a regime-aware
 
 Zero external dependencies. Python 3.10+.
 
-> **New here?** Read [PRODUCT.md](PRODUCT.md) for the full value proposition, core use case walkthrough, and component architecture before diving into the technical docs below.
+> **New here?** Read [PRODUCT.md](PRODUCT.md) for the full value proposition and core use case walkthrough, or jump to [USE_CASES.md](USE_CASES.md) for three ready-to-paste code snippets — regime-gated trade execution, decay-aware position sizing, and regime shift alerting.
 
 ## Install
 
