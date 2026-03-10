@@ -15,6 +15,26 @@ cd post-fiat-signals
 
 No pip install required. The SDK is a single package with no dependencies beyond the Python standard library.
 
+## Try It Locally
+
+Run every example against a built-in mock server — no live API needed:
+
+```bash
+# 1. Start the mock server (serves all 6 endpoints with realistic test data)
+python3 examples/mock_server.py &
+
+# 2. Point the SDK at the mock
+export PF_API_URL=http://localhost:8080
+
+# 3. Run any example
+python3 examples/regime_scanner.py    # 7-gate EXECUTE/WAIT decision engine
+python3 examples/watchdog.py          # circuit breaker integrity check
+```
+
+The mock server returns plausible NEUTRAL-regime data with 2 ACTIONABLE signals (NVDA/RNDR, AMD/TAO), so the scanner will output EXECUTE and the watchdog will return VALID or DEGRADED. All three [USE_CASES.md](USE_CASES.md) snippets also work against the mock — paste them into a script, set `PF_API_URL`, and run.
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
 ## Quickstart
 
 ```python
