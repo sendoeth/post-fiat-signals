@@ -27,11 +27,14 @@ python3 examples/mock_server.py &
 export PF_API_URL=http://localhost:8080
 
 # 3. Run any example
-python3 examples/regime_scanner.py    # 7-gate EXECUTE/WAIT decision engine
-python3 examples/watchdog.py          # circuit breaker integrity check
+python3 examples/full_pipeline_demo.py  # full 3-stage pipeline (recommended)
+python3 examples/regime_scanner.py      # 7-gate EXECUTE/WAIT decision engine
+python3 examples/watchdog.py            # circuit breaker integrity check
 ```
 
-The mock server returns plausible NEUTRAL-regime data with 2 ACTIONABLE signals (NVDA/RNDR, AMD/TAO), so the scanner will output EXECUTE and the watchdog will return VALID or DEGRADED. All three [USE_CASES.md](USE_CASES.md) snippets also work against the mock — paste them into a script, set `PF_API_URL`, and run.
+The mock server returns plausible NEUTRAL-regime data with 2 ACTIONABLE signals (NVDA/RNDR, AMD/TAO), so the pipeline will output EXECUTE_REDUCED (2 execute, 3 wait), the scanner will output EXECUTE, and the watchdog will return DEGRADED. All three [USE_CASES.md](USE_CASES.md) snippets also work against the mock — paste them into a script, set `PF_API_URL`, and run.
+
+The pipeline demo chains all three stages (watchdog → scanner → trade decision) into a single script and writes structured JSON to `pipeline_output.json`. See [PIPELINE_DEMO_REQUIREMENTS.md](PIPELINE_DEMO_REQUIREMENTS.md) for the full architecture spec.
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 
@@ -162,6 +165,14 @@ Three independent health dimensions are checked:
 | Regime Confidence | Classifier confidence, alert status, backtest accuracy | Confidence below 50, alert active, or FP rate > 50% | (rolls up from sub-checks) |
 
 **Workflow:**
+
+The recommended way to run the full pipeline is the demo script, which chains all three stages automatically:
+
+```bash
+python3 examples/full_pipeline_demo.py && python3 my_bot.py
+```
+
+Or run the stages individually:
 
 1. Run `watchdog.py` — if STOP, do not trade. If DEGRADED, reduce position sizes.
 2. Run `regime_scanner.py` — if WAIT, no actionable setup exists.
