@@ -189,6 +189,10 @@ Or run the stages individually:
 
 The baselines come from 264 trading days of backtesting. Models drift. The watchdog catches that drift before it costs money. A VALID verdict means the statistical foundation (Granger-validated semi-leads-crypto at 1h-72h lag, 82% hit rate under NEUTRAL) is still intact. A STOP verdict means something has shifted and the historical edge may no longer apply.
 
+**If the live API returns STOP**: this is expected protective behavior during the current SYSTEMIC regime, not a malfunction. See [`docs/STOP_STATE_DIAGNOSTIC.md`](docs/STOP_STATE_DIAGNOSTIC.md) for the full root cause analysis. Use the mock server to test the HEALTHY and DEGRADED paths locally.
+
+**Testing**: 15 end-to-end integration tests cover the full pipeline across HEALTHY, DEGRADED, and HALT states. See [`TESTING.md`](TESTING.md) for results and what each scenario proves.
+
 ## Configuration
 
 The SDK reads `PF_API_URL` from the environment by default in the example scripts. The `RegimeClient` constructor accepts `base_url` directly:
