@@ -10,7 +10,7 @@ Zero external dependencies. Python 3.10+.
 
 Check whether the signal stack is safe to integrate against before you start:
 
-**[`status.json`](status.json)** — current health state of all subsystems (regime engine, Granger pipeline, circuit breaker). Updated before each commit. States: `HEALTHY` (safe to integrate), `DEGRADED` (proceed with caution), `HALT` (signals blocked — protective behavior, not a crash). Each component includes a human-readable message explaining the current condition.
+**[`status.json`](status.json)** — current health state of all subsystems (regime engine, Granger pipeline, circuit breaker). Auto-updated every 15 minutes via cron (`update_status.sh`). States: `HEALTHY` (safe to integrate), `DEGRADED` (proceed with caution), `HALT` (signals blocked — protective behavior, not a crash). Each component includes a human-readable message explaining the current condition. Check the `generated_at` timestamp to confirm freshness.
 
 Live endpoint: `GET http://84.32.34.46:8080/system/status` — same schema, real-time.
 
