@@ -6,6 +6,14 @@ Zero external dependencies. Python 3.10+.
 
 > **New here?** Read [PRODUCT.md](PRODUCT.md) for the full value proposition and core use case walkthrough, or jump to [USE_CASES.md](USE_CASES.md) for three ready-to-paste code snippets — regime-gated trade execution, decay-aware position sizing, and regime shift alerting.
 
+## System Health
+
+Check whether the signal stack is safe to integrate against before you start:
+
+**[`status.json`](status.json)** — current health state of all subsystems (regime engine, Granger pipeline, circuit breaker). Updated before each commit. States: `HEALTHY` (safe to integrate), `DEGRADED` (proceed with caution), `HALT` (signals blocked — protective behavior, not a crash). Each component includes a human-readable message explaining the current condition.
+
+Live endpoint: `GET http://84.32.34.46:8080/system/status` — same schema, real-time.
+
 ## Install
 
 ```bash
@@ -111,6 +119,7 @@ Everything else is WAIT. SEMI_LEADS under NEUTRAL is a documented anti-signal (1
 | `/signals/filtered` | Regime-conditional signal filter (ACTIONABLE/SUPPRESS/AMBIGUOUS) | `get_filtered_signals()` |
 | `/regime/history` | 90-day regime transition timeline | `get_regime_history()` |
 | `/health` | Server health, uptime, data freshness | `get_health()` |
+| `/system/status` | Public system health surface — overall + per-component health with explanations | — |
 
 ## Error Handling
 
