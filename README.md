@@ -193,6 +193,10 @@ The baselines come from 264 trading days of backtesting. Models drift. The watch
 
 **Testing**: 15 end-to-end integration tests cover the full pipeline across HEALTHY, DEGRADED, and HALT states. See [`TESTING.md`](TESTING.md) for results and what each scenario proves.
 
+## b1e55ed Integration
+
+**[`INTEGRATION_B1E55ED.md`](INTEGRATION_B1E55ED.md)** — drop-in producer for b1e55ed's event-sourced engine. Copy `integration/regime_scanner_producer.py` to their `engine/producers/` directory, set `PF_REGIME_API_URL`, and it auto-discovers via `@register`. Emits `SIGNAL_TRADFI_V1` events from our `/signals/filtered` API and `FORECAST_V1` events via a regime-aware interpreter. Includes regime state mapping (NEUTRAL→BULL, SYSTEMIC→CRISIS) and signal classification (CRYPTO_LEADS→long, SEMI_LEADS→abstain).
+
 ## Builder Validation
 
 **[`VALIDATION_REPORT.md`](VALIDATION_REPORT.md)** — structured results from the first builder validation loop. Documents friction points found during a zero-assistance quickstart attempt, fixes shipped from the feedback, and external builder outreach status. Updated as external responses arrive.
