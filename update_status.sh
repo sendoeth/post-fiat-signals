@@ -31,7 +31,7 @@ fi
 
 # Regenerate status.json from live API
 export PF_API_URL="http://localhost:8080"
-export PF_PUBLIC_URL="${PF_PUBLIC_URL:-http://localhost:8080}"
+export PF_PUBLIC_URL="http://<signal-api-host>:8080"
 python3 generate_status.py --out "$STATUS_FILE" 2>&1 | while read line; do echo "$LOG_PREFIX $line"; done
 
 # Check new fingerprint
