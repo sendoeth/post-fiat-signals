@@ -193,6 +193,14 @@ The baselines come from 264 trading days of backtesting. Models drift. The watch
 
 **Testing**: 15 end-to-end integration tests cover the full pipeline across HEALTHY, DEGRADED, and HALT states. See [`TESTING.md`](TESTING.md) for results and what each scenario proves.
 
+## Performance Ledger
+
+**[`performance_log.json`](performance_log.json)** — forward-testing proof layer. Logs every pipeline decision in real time: NO_TRADE entries during STOP regimes (capital preservation evidence) and EXECUTE entries with live prices during actionable regimes (with automated 14-day outcome evaluation). Auto-updated every 15 minutes via cron (`update_ledger.sh`).
+
+Each entry includes SPI-aligned fields (`ticker`, `action`, `confidence`, `horizon_hours`) for direct consumption by downstream systems like the b1e55ed attribution pipeline. Entries are deduplicated by 15-min cycle key and written atomically.
+
+See **[`LEDGER_SCHEMA.md`](LEDGER_SCHEMA.md)** for the full schema reference — field definitions, evaluation lifecycle, summary object spec, and b1e55ed SPI field mapping.
+
 ## b1e55ed Integration
 
 **[`INTEGRATION_B1E55ED.md`](INTEGRATION_B1E55ED.md)** — drop-in producer for b1e55ed's event-sourced engine. Copy `integration/regime_scanner_producer.py` to their `engine/producers/` directory, set `PF_REGIME_API_URL`, and it auto-discovers via `@register`. Emits `SIGNAL_TRADFI_V1` events from our `/signals/filtered` API and `FORECAST_V1` events via a regime-aware interpreter. Includes regime state mapping (NEUTRAL→BULL, SYSTEMIC→CRISIS) and signal classification (CRYPTO_LEADS→long, SEMI_LEADS→abstain).
