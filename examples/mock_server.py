@@ -106,6 +106,98 @@ def _regime_proximity_systemic():
     }
 
 
+def _transition_forecast_neutral():
+    """Transition forecast when already in NEUTRAL — no forecast needed."""
+    return {
+        "status": "AT_NEUTRAL",
+        "message": "Regime is already NEUTRAL — signals are live and actionable. No transition forecast needed.",
+        "currentTrajectory": None,
+        "estimatedTransition": None,
+        "recoveryRequirements": None,
+        "projectedRegime": "NEUTRAL",
+        "historicalCalibration": None,
+        "backtestValidation": None,
+    }
+
+
+def _transition_forecast_systemic():
+    """Transition forecast during SYSTEMIC — full predictor output."""
+    return {
+        "status": "NO_RECOVERY_SIGNAL",
+        "message": "All 3 signal types are deteriorating. No velocity-based recovery estimate available. Historical calibration: SYSTEMIC periods lasted 4-13 days (median 8.5d, current: 12d). If recovery begins now, confidence bands: optimistic ~5d, base ~7d, pessimistic ~15d. Key bottleneck: Full Decouple (28 pct above threshold).",
+        "currentTrajectory": {
+            "allDeteriorating": True,
+            "anyRecovering": False,
+            "recoveringCount": 0,
+            "deterioratingCount": 3,
+            "stableCount": 0,
+            "fastestRecovering": {"type": "SEMI_LEADS", "velocity": -0.41},
+            "slowestRecovering": {"type": "CRYPTO_LEADS", "velocity": -0.47},
+        },
+        "estimatedTransition": {
+            "pessimistic": {
+                "days": 15,
+                "date": "2026-04-02",
+                "scenario": "Slowest observed SYSTEMIC recovery rate (1.92 pct/day)",
+            },
+            "base": {
+                "days": 7,
+                "date": "2026-03-25",
+                "scenario": "Median historical SYSTEMIC recovery rate (4.08 pct/day) applied to current distances",
+            },
+            "optimistic": {
+                "days": 5,
+                "date": "2026-03-23",
+                "scenario": "Fastest observed SYSTEMIC recovery rate (6.25 pct/day) applied to current distances",
+            },
+        },
+        "recoveryRequirements": {
+            "condition": "2 of 3 signal types must recover below 20% decay threshold",
+            "targetHorizonDays": 14,
+            "perType": [
+                {"type": "SEMI_LEADS", "label": "Semi Leads", "currentVelocity": -0.41, "requiredVelocity": 0.195, "requiredDailyRecoveryPct": 1.72, "velocityGap": 0.605, "feasibility": "REVERSED"},
+                {"type": "FULL_DECOUPLE", "label": "Full Decouple", "currentVelocity": -0.45, "requiredVelocity": 0.208, "requiredDailyRecoveryPct": 2.0, "velocityGap": 0.658, "feasibility": "REVERSED"},
+                {"type": "CRYPTO_LEADS", "label": "Crypto Leads", "currentVelocity": -0.47, "requiredVelocity": 0.216, "requiredDailyRecoveryPct": 2.19, "velocityGap": 0.686, "feasibility": "REVERSED"},
+            ],
+            "leader": {"type": "SEMI_LEADS", "label": "Semi Leads", "distanceToThreshold": 24.1},
+            "bottleneck": {"type": "FULL_DECOUPLE", "label": "Full Decouple", "distanceToThreshold": 28.0},
+        },
+        "projectedRegime": "EARNINGS",
+        "typeProjections": [
+            {"type": "SEMI_LEADS", "label": "Semi Leads", "distanceToThreshold": 24.1, "velocity": -0.41, "dailyVelocity": -0.082, "daysToThreshold": None, "trajectoryNote": "Deteriorating — moving away from threshold"},
+            {"type": "FULL_DECOUPLE", "label": "Full Decouple", "distanceToThreshold": 28.0, "velocity": -0.45, "dailyVelocity": -0.09, "daysToThreshold": None, "trajectoryNote": "Deteriorating — moving away from threshold"},
+            {"type": "CRYPTO_LEADS", "label": "Crypto Leads", "distanceToThreshold": 30.6, "velocity": -0.47, "dailyVelocity": -0.094, "daysToThreshold": None, "trajectoryNote": "Deteriorating — moving away from threshold"},
+        ],
+        "historicalCalibration": {
+            "observedSystemicPeriods": [
+                {"entryDate": "2025-11-06", "exitDate": "2025-11-19", "exitTo": "NEUTRAL", "durationDays": 13, "impliedDailyRecoveryPct": 1.92},
+                {"entryDate": "2025-11-24", "exitDate": "2025-11-28", "exitTo": "NEUTRAL", "durationDays": 4, "impliedDailyRecoveryPct": 6.25},
+            ],
+            "periodCount": 2,
+            "medianDurationDays": 8.5,
+            "fastestRecoveryDays": 4,
+            "slowestRecoveryDays": 13,
+            "medianRecoveryRatePctPerDay": 4.08,
+            "fastestRecoveryRatePctPerDay": 6.25,
+            "slowestRecoveryRatePctPerDay": 1.92,
+            "currentDurationDays": 12,
+            "durationPercentile": 50,
+            "durationContext": "Current SYSTEMIC period (12d) is longer than 50% of historical periods",
+        },
+        "backtestValidation": {
+            "method": "Retrospective analysis: apply median recovery rate to historical SYSTEMIC entry distances, compare predicted vs actual exit dates",
+            "limitation": "Historical per-type velocity snapshots are not stored. Backtest uses implied recovery rates computed from observed transition durations rather than actual velocity data at time of prediction.",
+            "transitions": [
+                {"period": "2025-11-06 -> 2025-11-19", "exitTo": "NEUTRAL", "actualDays": 13, "modelPredictedDays": 7, "errorDays": -6, "absError": 6, "impliedRecoveryRate": 1.92, "note": "Within normal range for velocity-based prediction"},
+                {"period": "2025-11-24 -> 2025-11-28", "exitTo": "NEUTRAL", "actualDays": 4, "modelPredictedDays": 7, "errorDays": 3, "absError": 3, "impliedRecoveryRate": 6.25, "note": "Rapid recovery — likely driven by sudden market reversal"},
+            ],
+            "meanAbsoluteErrorDays": 4.5,
+            "sampleSize": 2,
+            "assessment": "Moderate predictive accuracy (MAE 3-7 days)",
+        },
+    }
+
+
 def regime_current():
     return {
         "state": "NEUTRAL",
@@ -147,6 +239,7 @@ def regime_current():
             "fpRate": 40,
         },
         "regimeProximity": _regime_proximity_neutral(),
+        "transitionForecast": _transition_forecast_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -254,6 +347,7 @@ def signals_filtered():
         "decision": "TRADE",
         "decisionReason": "NEUTRAL regime — 2 actionable signals (CRYPTO_LEADS). Hit rate 82% with 8.2% avg return under this regime.",
         "regimeProximity": _regime_proximity_neutral(),
+        "transitionForecast": _transition_forecast_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,

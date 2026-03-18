@@ -14,6 +14,10 @@ Check whether the signal stack is safe to integrate against before you start:
 
 Live endpoint: `GET http://<your-server-ip>:8080/system/status` — same schema, real-time. Replace `<your-server-ip>` with the IP of the node running `signal_api.js`.
 
+## Regime Transition Forecast
+
+`GET /regime/current` includes a `transitionForecast` object that estimates when the current SYSTEMIC regime will end. Uses velocity-based forward projection with historical calibration from observed SYSTEMIC periods. Outputs confidence bands (optimistic/base/pessimistic), per-type recovery requirements, and backtest validation against past transitions. See [`docs/TRANSITION_FORECAST.md`](docs/TRANSITION_FORECAST.md) for the full algorithm, field reference, and consumer usage patterns.
+
 ## Forward-Test Audit Dashboard
 
 **[Live Dashboard](https://sendoeth.github.io/validator/audit.html)** — 6-panel real-time monitoring surface polling the live API every 60 seconds. Shows decision status, regime proximity gradient, ledger accumulation progress (7-day milestone), system health, regime timeline, and consumer activity. Single-file HTML, zero dependencies. See [`docs/AUDIT_DASHBOARD.md`](docs/AUDIT_DASHBOARD.md) for full documentation.
