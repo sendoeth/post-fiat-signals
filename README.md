@@ -14,6 +14,10 @@ Check whether the signal stack is safe to integrate against before you start:
 
 Live endpoint: `GET http://<your-server-ip>:8080/system/status` — same schema, real-time. Replace `<your-server-ip>` with the IP of the node running `signal_api.js`.
 
+## Forward-Test Audit Dashboard
+
+**[Live Dashboard](https://sendoeth.github.io/validator/audit.html)** — 6-panel real-time monitoring surface polling the live API every 60 seconds. Shows decision status, regime proximity gradient, ledger accumulation progress (7-day milestone), system health, regime timeline, and consumer activity. Single-file HTML, zero dependencies. See [`docs/AUDIT_DASHBOARD.md`](docs/AUDIT_DASHBOARD.md) for full documentation.
+
 ## Install
 
 ```bash

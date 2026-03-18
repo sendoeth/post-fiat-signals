@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post Fiat — Forward-Test Audit Dashboard</title>
+<style>
+/* ── Reset & Base ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117;
+  --card-bg: #161b22;
+  --card-border: #30363d;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --accent-blue: #58a6ff;
+  --green: #238636;
+  --green-bright: #7ee787;
+  --yellow: #d29922;
+  --orange: #e3b341;
+  --red: #da3633;
+  --red-bright: #f85149;
+  --purple: #8957e5;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
+html { font-size: 14px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Stale Warning Banner ──────────────────────────────────────────────── */
+#stale-banner {
+  display: none;
+  background: var(--red);
+  color: #fff;
+  text-align: center;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  animation: pulse-bg 2s ease-in-out infinite;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+header {
+  border-bottom: 1px solid var(--card-border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-left { display: flex; flex-direction: column; gap: 2px; }
+
+.header-left h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.header-left .subtitle {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.header-left .subtitle a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+.header-left .subtitle a:hover { text-decoration: underline; }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.countdown {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+
+.conn-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-bright);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.conn-dot.disconnected {
+  background: var(--red-bright);
+  animation: pulse-dot-red 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(126, 231, 135, 0.5); }
+  50% { box-shadow: 0 0 0 4px rgba(126, 231, 135, 0.15); }
+}
+
+@keyframes pulse-dot-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.5); }
+  50% { box-shadow: 0 0 0 4px rgba(248, 81, 73, 0.2); }
+}
+
+.conn-label { color: var(--green-bright); }
+.conn-label.disconnected { color: var(--red-bright); }
+
+/* ── Grid Layout ───────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 20px 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1100px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
+  header { padding: 12px 16px; }
+}
+
+/* ── Card ──────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 20px;
+  transition: border-color 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover { border-color: #484f58; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.card-timestamp {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+.card-error {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 24px 0;
+}
+
+/* ── Badge ─────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-lg {
+  padding: 8px 24px;
+  font-size: 1.4rem;
+  border-radius: 6px;
+}
+
+.badge-green { background: rgba(35, 134, 54, 0.2); color: var(--green-bright); border: 1px solid rgba(35, 134, 54, 0.4); }
+.badge-red { background: rgba(218, 54, 51, 0.2); color: var(--red-bright); border: 1px solid rgba(218, 54, 51, 0.4); }
+.badge-yellow { background: rgba(210, 153, 34, 0.15); color: var(--yellow); border: 1px solid rgba(210, 153, 34, 0.35); }
+.badge-orange { background: rgba(227, 179, 65, 0.15); color: var(--orange); border: 1px solid rgba(227, 179, 65, 0.35); }
+.badge-purple { background: rgba(137, 87, 229, 0.2); color: #bc8cff; border: 1px solid rgba(137, 87, 229, 0.4); }
+.badge-blue { background: rgba(88, 166, 255, 0.15); color: var(--accent-blue); border: 1px solid rgba(88, 166, 255, 0.3); }
+.badge-dim { background: rgba(139, 148, 158, 0.1); color: var(--text-dim); border: 1px solid rgba(139, 148, 158, 0.2); }
+
+/* ── Utility ───────────────────────────────────────────────────────────── */
+.big-number {
+  font-family: var(--font-mono);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.5);
+  font-size: 0.85rem;
+}
+
+.stat-row:last-child { border-bottom: none; }
+.stat-label { color: var(--text-dim); }
+.stat-value { font-family: var(--font-mono); font-weight: 600; }
+
+.reason-text {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(13, 17, 23, 0.6);
+  border-radius: 6px;
+  border-left: 3px solid var(--card-border);
+}
+
+.interpretation-text {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: rgba(13, 17, 23, 0.6);
+  border-radius: 4px;
+}
+
+/* ── Panel 2: Proximity Bars ───────────────────────────────────────────── */
+.prox-type-row {
+  margin-bottom: 12px;
+}
+
+.prox-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 0.8rem;
+}
+
+.prox-type-name { font-weight: 600; color: var(--text); }
+.prox-type-stats {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.prox-bar-track {
+  position: relative;
+  height: 20px;
+  background: rgba(48, 54, 61, 0.5);
+  border-radius: 3px;
+  overflow: visible;
+}
+
+.prox-bar-fill {
+  height: 100%;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(90deg, var(--red), var(--red-bright));
+  transition: width 0.6s ease;
+  min-width: 1px;
+}
+
+.prox-bar-threshold {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--yellow);
+  left: 33.33%; /* 20% / 60% scale */
+  z-index: 2;
+}
+
+.prox-bar-threshold::after {
+  content: '20%';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6rem;
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.prox-est {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+.prox-est.recovering { color: var(--green-bright); }
+.prox-est.deteriorating { color: var(--red-bright); }
+
+/* ── Sparkline ─────────────────────────────────────────────────────────── */
+.sparkline-container {
+  margin-top: 10px;
+  padding: 6px 0;
+}
+
+.sparkline-label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.sparkline-svg {
+  display: block;
+  width: 100%;
+  height: 40px;
+}
+
+/* ── Progress bar ──────────────────────────────────────────────────────── */
+.progress-track {
+  height: 10px;
+  background: rgba(48, 54, 61, 0.6);
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-blue), var(--green-bright));
+  border-radius: 5px;
+  transition: width 0.6s ease;
+}
+
+/* ── Panel 4: System Health components ─────────────────────────────────── */
+.component-row {
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.component-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.component-name {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.component-msg {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+/* ── Panel 5: Timeline ─────────────────────────────────────────────────── */
+.timeline-bar {
+  display: flex;
+  height: 28px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.timeline-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: flex-basis 0.6s ease;
+  min-width: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.transition-list {
+  max-height: 160px;
+  overflow-y: auto;
+  font-size: 0.78rem;
+}
+
+.transition-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.3);
+}
+
+.transition-date {
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  min-width: 80px;
+  font-size: 0.72rem;
+}
+
+.transition-arrow {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+}
+
+/* ── Panel 6: Consumer Activity ────────────────────────────────────────── */
+.mini-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.mini-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+
+.mini-bar-label {
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  min-width: 130px;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-bar-track {
+  flex: 1;
+  height: 14px;
+  background: rgba(48, 54, 61, 0.4);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mini-bar-fill {
+  height: 100%;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.mini-bar-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  min-width: 28px;
+}
+
+.request-log {
+  max-height: 140px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  line-height: 1.6;
+}
+
+.request-log-entry {
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(48, 54, 61, 0.3);
+  color: var(--text-dim);
+}
+
+.request-log-entry .method { color: var(--green-bright); font-weight: 600; }
+.request-log-entry .path { color: var(--accent-blue); }
+.request-log-entry .status { color: var(--text); }
+.request-log-entry .time { color: var(--text-dim); }
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--card-border);
+  padding: 14px 24px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+footer a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+footer a:hover { text-decoration: underline; }
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* ── Fade-in animation for data updates ────────────────────────────────── */
+.fade-update {
+  animation: fade-in 0.4s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0.5; }
+  to { opacity: 1; }
+}
+
+/* ── Loading skeleton ──────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--card-border) 25%, rgba(48, 54, 61, 0.8) 50%, var(--card-border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+  height: 20px;
+  margin: 6px 0;
+}
+
+.skeleton.big { height: 48px; width: 120px; margin-bottom: 12px; }
+.skeleton.medium { height: 14px; width: 80%; }
+.skeleton.short { height: 14px; width: 50%; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ── Bottleneck highlight ──────────────────────────────────────────────── */
+.prox-type-row.bottleneck-highlight {
+  border-left: 3px solid var(--yellow);
+  padding-left: 8px;
+}
+
+/* ── Decision signals table ────────────────────────────────────────────── */
+.signal-counts {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.signal-count-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(13, 17, 23, 0.5);
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+  min-width: 70px;
+}
+
+.signal-count-num {
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.signal-count-label {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+</style>
+</head>
+<body>
+
+<!-- Stale warning banner -->
+<div id="stale-banner">DATA STALE — Displaying last known state. API connection lost.</div>
+
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <h1>Post Fiat &mdash; Forward-Test Audit Dashboard</h1>
+    <div class="subtitle">
+      Live signal pipeline monitoring &nbsp;|&nbsp; Source: rfLJ4ZRnqmGFLAcMvCD56nKGbjpdTJmMqo
+      &nbsp;|&nbsp; <a href="https://github.com/sendoeth/post-fiat-signals" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="countdown" id="countdown">Next refresh in 60s</div>
+    <div class="conn-status">
+      <div class="conn-dot" id="conn-dot"></div>
+      <span class="conn-label" id="conn-label">CONNECTING</span>
+    </div>
+  </div>
+</header>
+
+<!-- Main Grid -->
+<div class="grid">
+
+  <!-- Panel 1: Decision Status -->
+  <div class="card" id="panel-decision">
+    <div class="card-header">
+      <span class="card-title">Decision Status</span>
+      <span class="card-timestamp" id="decision-ts"></span>
+    </div>
+    <div id="decision-body">
+      <div class="skeleton big"></div>
+      <div class="skeleton medium"></div>
+      <div class="skeleton short"></div>
+    </div>
+  </div>
+
+  <!-- Panel 2: Regime Proximity Gradient -->
+  <div class="card" id="panel-proximity">
+    <div class="card-header">
+      <span class="card-title">Regime Proximity Gradient</span>
+      <span class="card-timestamp" id="proximity-ts"></span>
+    </div>
+    <div id="proximity-body">
+      <div class="skeleton big"></div>
+      <div class="skeleton medium"></div>
+      <div class="skeleton medium"></div>
+      <div class="skeleton short"></div>
+    </div>
+  </div>
+
+  <!-- Panel 3: Ledger Accumulation -->
+  <div class="card" id="panel-ledger">
+    <div class="card-header">
+      <span class="card-title">Ledger Accumulation</span>
+      <span class="card-timestamp" id="ledger-ts"></span>
+    </div>
+    <div id="ledger-body">
+      <div class="skeleton big"></div>
+      <div class="skeleton medium"></div>
+      <div class="skeleton short"></div>
+    </div>
+  </div>
+
+  <!-- Panel 4: System Health -->
+  <div class="card" id="panel-health">
+    <div class="card-header">
+      <span class="card-title">System Health</span>
+      <span class="card-timestamp" id="health-ts"></span>
+    </div>
+    <div id="health-body">
+      <div class="skeleton big"></div>
+      <div class="skeleton medium"></div>
+      <div class="skeleton medium"></div>
+      <div class="skeleton medium"></div>
+    </div>
+  </div>
+
+  <!-- Panel 5: Regime Timeline -->
+  <div class="card" id="panel-timeline">
+    <div class="card-header">
+      <span class="card-title">Regime Timeline</span>
+      <span class="card-timestamp" id="timeline-ts"></span>
+    </div>
+    <div id="timeline-body">
+      <div class="skeleton medium"></div>
+      <div class="skeleton big"></div>
+      <div class="skeleton medium"></div>
+    </div>
+  </div>
+
+  <!-- Panel 6: Consumer Activity -->
+  <div class="card" id="panel-consumer">
+    <div class="card-header">
+      <span class="card-title">Consumer Activity</span>
+      <span class="card-timestamp" id="consumer-ts"></span>
+    </div>
+    <div id="consumer-body">
+      <div class="skeleton big"></div>
+      <div class="skeleton medium"></div>
+      <div class="skeleton short"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  Data refreshes every 60s &nbsp;|&nbsp; Schema v1.1.0 &nbsp;|&nbsp;
+  Docs: <a href="https://github.com/sendoeth/post-fiat-signals/blob/main/docs/REGIME_PROXIMITY.md" target="_blank" rel="noopener">REGIME_PROXIMITY.md</a>,
+  <a href="https://github.com/sendoeth/post-fiat-signals/blob/main/docs/DECISION_FIELD.md" target="_blank" rel="noopener">DECISION_FIELD.md</a>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   Post Fiat — Forward-Test Audit Dashboard
+   Single-file vanilla JS, zero external dependencies
+   Polls 6 API endpoints every 60 seconds
+   ══════════════════════════════════════════════════════════════════════════ */
+
+// ── Configuration ─────────────────────────────────────────────────────────
+const API_BASE = (function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('api')) return params.get('api').replace(/\/$/, '');
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://localhost:8080';
+  return 'http://84.32.34.46:8080';
+})();
+const POLL_INTERVAL_MS = 60000;
+const FETCH_TIMEOUT_MS = 12000;
+
+// ── State ─────────────────────────────────────────────────────────────────
+let connected = false;
+let countdown = 60;
+let countdownTimer = null;
+let lastFetchTime = null;
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+
+function escHtml(str) {
+  if (str === null || str === undefined) return '';
+  const d = document.createElement('div');
+  d.textContent = String(str);
+  return d.innerHTML;
+}
+
+function fmtTime(isoStr) {
+  if (!isoStr) return '--';
+  try {
+    const d = new Date(isoStr);
+    return d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch { return isoStr; }
+}
+
+function fmtDate(isoStr) {
+  if (!isoStr) return '--';
+  try {
+    const d = new Date(isoStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  } catch { return isoStr; }
+}
+
+function fmtUptime(seconds) {
+  if (!seconds && seconds !== 0) return '--';
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (d > 0) return d + 'd ' + h + 'h ' + m + 'm';
+  if (h > 0) return h + 'h ' + m + 'm';
+  return m + 'm ' + (seconds % 60) + 's';
+}
+
+function badgeClass(label) {
+  if (!label) return 'badge-dim';
+  const l = label.toUpperCase();
+  if (l === 'HEALTHY' || l === 'TRADE' || l === 'AT_NEUTRAL' || l === 'NEAR_TRANSITION' || l === 'RECOVERING_LABEL') return 'badge-green';
+  if (l === 'DEGRADED' || l === 'RECOVERING' || l === 'STABILIZING') return 'badge-yellow';
+  if (l === 'HALT' || l === 'ENTRENCHED') return 'badge-red';
+  if (l === 'NO_TRADE') return 'badge-purple';
+  if (l === 'ACTIONABLE') return 'badge-green';
+  if (l === 'SUPPRESS') return 'badge-red';
+  if (l === 'AMBIGUOUS') return 'badge-yellow';
+  return 'badge-dim';
+}
+
+function proximityBadgeClass(label) {
+  if (!label) return 'badge-dim';
+  switch (label.toUpperCase()) {
+    case 'ENTRENCHED': return 'badge-red';
+    case 'STABILIZING': return 'badge-orange';
+    case 'RECOVERING': return 'badge-yellow';
+    case 'NEAR_TRANSITION': return 'badge-green';
+    case 'AT_NEUTRAL': return 'badge-green';
+    default: return 'badge-dim';
+  }
+}
+
+function velocityBadgeClass(label) {
+  if (!label) return 'badge-dim';
+  switch (label.toUpperCase()) {
+    case 'RECOVERING': return 'badge-green';
+    case 'STABLE': return 'badge-blue';
+    case 'DETERIORATING': return 'badge-red';
+    default: return 'badge-dim';
+  }
+}
+
+function regimeColor(regime) {
+  if (!regime) return '#484f58';
+  switch (regime.toUpperCase()) {
+    case 'NEUTRAL': return '#238636';
+    case 'SYSTEMIC': return '#da3633';
+    case 'EARNINGS': return '#d29922';
+    case 'DIVERGENCE': return '#e3b341';
+    default: return '#484f58';
+  }
+}
+
+function regimeTextColor(regime) {
+  if (!regime) return '#e6edf3';
+  switch (regime.toUpperCase()) {
+    case 'NEUTRAL': return '#7ee787';
+    case 'SYSTEMIC': return '#fff';
+    case 'EARNINGS': return '#fff';
+    case 'DIVERGENCE': return '#1c2128';
+    default: return '#e6edf3';
+  }
+}
+
+async function fetchJSON(endpoint) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const resp = await fetch(API_BASE + endpoint, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
+  } catch (e) {
+    clearTimeout(timeout);
+    throw e;
+  }
+}
+
+// ── Connection Status ─────────────────────────────────────────────────────
+
+function setConnected(state) {
+  connected = state;
+  const dot = document.getElementById('conn-dot');
+  const label = document.getElementById('conn-label');
+  const banner = document.getElementById('stale-banner');
+
+  if (state) {
+    dot.className = 'conn-dot';
+    label.className = 'conn-label';
+    label.textContent = 'LIVE';
+    banner.style.display = 'none';
+  } else {
+    dot.className = 'conn-dot disconnected';
+    label.className = 'conn-label disconnected';
+    label.textContent = 'DISCONNECTED';
+    banner.style.display = 'block';
+  }
+}
+
+// ── Countdown ─────────────────────────────────────────────────────────────
+
+function startCountdown() {
+  countdown = 60;
+  if (countdownTimer) clearInterval(countdownTimer);
+  countdownTimer = setInterval(function () {
+    countdown--;
+    if (countdown < 0) countdown = 0;
+    document.getElementById('countdown').textContent = 'Next refresh in ' + countdown + 's';
+  }, 1000);
+}
+
+// ── Proximity History (localStorage sparkline) ────────────────────────────
+
+function loadProximityHistory() {
+  try {
+    const raw = localStorage.getItem('pf_proximity_history');
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveProximityScore(score) {
+  try {
+    let hist = loadProximityHistory();
+    hist.push({ time: Date.now(), score: score });
+    // Keep last 24 data points
+    if (hist.length > 24) hist = hist.slice(-24);
+    localStorage.setItem('pf_proximity_history', JSON.stringify(hist));
+    return hist;
+  } catch { return []; }
+}
+
+function renderSparkline(history) {
+  if (!history || history.length < 1) return '<div class="sparkline-label">Sparkline: collecting data points...</div>';
+
+  const scores = history.map(function (h) { return h.score; });
+  const minS = Math.min.apply(null, scores);
+  const maxS = Math.max.apply(null, scores);
+  const range = maxS - minS || 0.01;
+  const w = 200;
+  const h = 36;
+  const pad = 2;
+  const plotW = w - pad * 2;
+  const plotH = h - pad * 2;
+
+  var points = [];
+  for (var i = 0; i < scores.length; i++) {
+    var x = pad + (scores.length === 1 ? plotW / 2 : (i / (scores.length - 1)) * plotW);
+    var y = pad + plotH - ((scores[i] - minS) / range) * plotH;
+    points.push(x.toFixed(1) + ',' + y.toFixed(1));
+  }
+
+  var polyline = points.join(' ');
+  // Area fill
+  var areaPoints = points.join(' ') + ' ' + (pad + plotW).toFixed(1) + ',' + (pad + plotH).toFixed(1) + ' ' + pad.toFixed(1) + ',' + (pad + plotH).toFixed(1);
+
+  var lastScore = scores[scores.length - 1];
+  var lastX = parseFloat(points[points.length - 1].split(',')[0]);
+  var lastY = parseFloat(points[points.length - 1].split(',')[1]);
+
+  var svg = '<svg class="sparkline-svg" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'
+    + '<polygon points="' + areaPoints + '" fill="rgba(88,166,255,0.08)" />'
+    + '<polyline points="' + polyline + '" fill="none" stroke="#58a6ff" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" />'
+    + '<circle cx="' + lastX.toFixed(1) + '" cy="' + lastY.toFixed(1) + '" r="2.5" fill="#58a6ff" />'
+    + '</svg>';
+
+  return '<div class="sparkline-container">'
+    + '<div class="sparkline-label">Proximity trend (' + history.length + ' data points, range ' + minS.toFixed(3) + ' - ' + maxS.toFixed(3) + ')</div>'
+    + svg
+    + '</div>';
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  PANEL RENDERERS
+// ══════════════════════════════════════════════════════════════════════════
+
+// ── Panel 1: Decision Status ──────────────────────────────────────────────
+
+function renderDecision(data) {
+  var ts = data.timestamp || '';
+  document.getElementById('decision-ts').textContent = fmtTime(ts);
+
+  var decision = data.decision || '--';
+  var reason = data.decisionReason || '';
+  var actionable = data.actionableCount || 0;
+  var suppressed = data.suppressedCount || 0;
+  var total = data.totalSignals || 0;
+
+  var decisionBadge = decision === 'TRADE' ? 'badge-green' : (decision === 'NO_TRADE' ? 'badge-purple' : 'badge-dim');
+
+  var html = '<div style="text-align:center;margin-bottom:14px;">'
+    + '<span class="badge badge-lg ' + decisionBadge + '">' + escHtml(decision) + '</span>'
+    + '</div>';
+
+  html += '<div class="signal-counts">'
+    + '<div class="signal-count-item"><span class="signal-count-num" style="color:var(--green-bright)">' + actionable + '</span><span class="signal-count-label">Actionable</span></div>'
+    + '<div class="signal-count-item"><span class="signal-count-num" style="color:var(--red-bright)">' + suppressed + '</span><span class="signal-count-label">Suppressed</span></div>'
+    + '<div class="signal-count-item"><span class="signal-count-num" style="color:var(--text)">' + total + '</span><span class="signal-count-label">Total</span></div>'
+    + '</div>';
+
+  if (reason) {
+    html += '<div class="reason-text">' + escHtml(reason) + '</div>';
+  }
+
+  html += '<div class="stat-row" style="margin-top:10px"><span class="stat-label">Regime</span><span class="stat-value"><span class="badge ' + badgeClass(data.regimeId) + '" style="' + regimeBadgeStyle(data.regimeId) + '">' + escHtml(data.regimeId || '--') + '</span></span></div>';
+  html += '<div class="stat-row"><span class="stat-label">Confidence</span><span class="stat-value">' + (data.regimeConfidence || '--') + '%</span></div>';
+  html += '<div class="stat-row"><span class="stat-label">Last Update</span><span class="stat-value">' + fmtTime(ts) + '</span></div>';
+
+  var el = document.getElementById('decision-body');
+  el.innerHTML = html;
+  el.classList.remove('fade-update');
+  void el.offsetWidth; // reflow
+  el.classList.add('fade-update');
+}
+
+function regimeBadgeStyle(regimeId) {
+  if (!regimeId) return '';
+  var bg = regimeColor(regimeId);
+  return 'background:' + bg + '22;color:' + regimeTextColor(regimeId) + ';border-color:' + bg + '66;';
+}
+
+// ── Panel 2: Regime Proximity ─────────────────────────────────────────────
+
+function renderProximity(data) {
+  var prox = data.regimeProximity;
+  if (!prox) {
+    document.getElementById('proximity-body').innerHTML = '<div class="card-error">No proximity data available</div>';
+    return;
+  }
+
+  document.getElementById('proximity-ts').textContent = fmtTime(data.timestamp);
+
+  // Save to history and get sparkline data
+  var history = saveProximityScore(prox.score);
+
+  var html = '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">'
+    + '<span class="big-number" style="color:var(--accent-blue)">' + (prox.score !== undefined ? prox.score.toFixed(3) : '--') + '</span>'
+    + '<span class="badge ' + proximityBadgeClass(prox.label) + '">' + escHtml(prox.label) + '</span>'
+    + '</div>';
+
+  html += '<div style="font-size:0.72rem;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:8px;">' + escHtml(prox.scale) + '</div>';
+
+  // Sparkline
+  html += renderSparkline(history);
+
+  // Stats row
+  if (prox.regimeDurationDays !== null && prox.regimeDurationDays !== undefined) {
+    html += '<div class="stat-row"><span class="stat-label">Regime Duration</span><span class="stat-value">' + prox.regimeDurationDays + ' days</span></div>';
+  }
+  if (prox.ifLeaderRecovers) {
+    html += '<div class="stat-row"><span class="stat-label">If Leader Recovers</span><span class="stat-value"><span class="badge badge-dim">' + escHtml(prox.ifLeaderRecovers) + '</span></span></div>';
+  }
+  if (prox.bottleneck) {
+    html += '<div class="stat-row"><span class="stat-label">Bottleneck</span><span class="stat-value" style="color:var(--yellow)">' + escHtml(prox.bottleneck.label) + ' (' + prox.bottleneck.dropPct + '% drop)</span></div>';
+  }
+
+  // Per-type bars
+  html += '<div style="margin-top:14px;margin-bottom:4px;font-size:0.75rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;">Signal Type Recovery</div>';
+
+  var perType = prox.perType || {};
+  var typeKeys = Object.keys(perType);
+  // Sort by recoveryScore descending (closest to recovery first)
+  typeKeys.sort(function (a, b) { return (perType[b].recoveryScore || 0) - (perType[a].recoveryScore || 0); });
+
+  for (var i = 0; i < typeKeys.length; i++) {
+    var tKey = typeKeys[i];
+    var t = perType[tKey];
+    var isBottleneck = prox.bottleneck && prox.bottleneck.type === tKey;
+    var barPct = Math.min((t.dropPct / 60) * 100, 100);
+
+    html += '<div class="prox-type-row' + (isBottleneck ? ' bottleneck-highlight' : '') + '">';
+    html += '<div class="prox-type-header">';
+    html += '<span class="prox-type-name">' + escHtml(typeLabel(tKey)) + (isBottleneck ? ' <span style="color:var(--yellow);font-size:0.68rem;">[BOTTLENECK]</span>' : '') + '</span>';
+    html += '<span class="prox-type-stats">' + t.dropPct.toFixed(1) + '% drop &nbsp; <span class="badge ' + velocityBadgeClass(t.velocityLabel) + '">' + escHtml(t.velocityLabel) + '</span></span>';
+    html += '</div>';
+
+    html += '<div class="prox-bar-track">';
+    html += '<div class="prox-bar-fill" style="width:' + barPct.toFixed(1) + '%"></div>';
+    html += '<div class="prox-bar-threshold"></div>';
+    html += '</div>';
+
+    // Estimated recovery days
+    html += renderEstRecovery(t);
+
+    html += '</div>';
+  }
+
+  // Interpretation
+  if (prox.interpretation) {
+    html += '<div class="interpretation-text">' + escHtml(prox.interpretation) + '</div>';
+  }
+
+  var el = document.getElementById('proximity-body');
+  el.innerHTML = html;
+  el.classList.remove('fade-update');
+  void el.offsetWidth;
+  el.classList.add('fade-update');
+}
+
+function typeLabel(key) {
+  var labels = {
+    'SEMI_LEADS': 'Semi Leads',
+    'CRYPTO_LEADS': 'Crypto Leads',
+    'FULL_DECOUPLE': 'Full Decouple'
+  };
+  return labels[key] || key;
+}
+
+function renderEstRecovery(t) {
+  // Estimate days to threshold
+  // distanceToThreshold is in percentage points (e.g., 24.1 means 24.1% above the 20% threshold)
+  // velocity is a rate of change ratio (positive = recovering)
+  // if velocity > 0: est days ~ distanceToThreshold / (velocity * dropPct * some factor)
+  // Simplified: if velocity > 0, distance / (velocity * 100) as rough days estimate
+
+  if (t.distanceToThreshold <= 0) {
+    return '<div class="prox-est recovering">At or below threshold - recovered</div>';
+  }
+
+  if (t.velocity > 0.02) {
+    // Recovering - estimate days
+    // velocity is fractional rate (e.g., 0.05 = 5% improvement per period)
+    // distanceToThreshold is in pct points
+    // rough: days ~ distanceToThreshold / (velocity * dropPct)
+    var ratePerDay = Math.abs(t.velocity) * t.dropPct;
+    if (ratePerDay > 0) {
+      var estDays = Math.ceil(t.distanceToThreshold / ratePerDay);
+      if (estDays > 365) estDays = 365;
+      return '<div class="prox-est recovering">Est. recovery: ~' + estDays + ' day' + (estDays !== 1 ? 's' : '') + '</div>';
+    }
+    return '<div class="prox-est recovering">Recovering - insufficient data for estimate</div>';
+  } else if (t.velocity < -0.02) {
+    return '<div class="prox-est deteriorating">Still deteriorating (v=' + t.velocity.toFixed(3) + ')</div>';
+  } else {
+    return '<div class="prox-est">Stable - no trend toward recovery</div>';
+  }
+}
+
+// ── Panel 3: Ledger Accumulation ──────────────────────────────────────────
+
+function renderLedger(data) {
+  document.getElementById('ledger-ts').textContent = fmtTime(data.timestamp);
+
+  if (data.error) {
+    document.getElementById('ledger-body').innerHTML = '<div class="card-error">' + escHtml(data.error) + '</div>';
+    return;
+  }
+
+  var liveEntries = data.liveEntries || 0;
+  var liveDays = data.liveDaysCovered || 0;
+  var progressPct = Math.min((liveDays / 7) * 100, 100);
+  var milestone7d = data.milestone7d || '--';
+  var reached = data.milestone7dReached || false;
+
+  var html = '<div class="big-number" style="color:var(--accent-blue)">' + liveEntries + '</div>';
+  html += '<div style="font-size:0.78rem;color:var(--text-dim);margin-top:2px;margin-bottom:12px;">live entries accumulated</div>';
+
+  // 7-day progress
+  html += '<div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:2px;">';
+  html += '<span style="color:var(--text-dim)">7-Day Milestone</span>';
+  html += '<span style="font-family:var(--font-mono);font-weight:600;color:' + (reached ? 'var(--green-bright)' : 'var(--text)') + '">' + liveDays + ' / 7 days' + (reached ? ' &#10003;' : '') + '</span>';
+  html += '</div>';
+  html += '<div class="progress-track"><div class="progress-fill" style="width:' + progressPct.toFixed(1) + '%"></div></div>';
+
+  if (milestone7d !== '--') {
+    html += '<div style="font-size:0.72rem;color:var(--text-dim);font-family:var(--font-mono);margin-bottom:10px;">Target date: ' + escHtml(milestone7d) + '</div>';
+  }
+
+  html += '<div class="stat-row"><span class="stat-label">NO_TRADE Streak</span><span class="stat-value" style="color:var(--purple)">' + (data.noTradeStreak || 0) + '</span></div>';
+  html += '<div class="stat-row"><span class="stat-label">Entry Rate</span><span class="stat-value">' + (data.entryRate || '--') + ' / day</span></div>';
+  html += '<div class="stat-row"><span class="stat-label">First Live Entry</span><span class="stat-value">' + fmtDate(data.firstLiveEntry) + ' ' + fmtTime(data.firstLiveEntry) + '</span></div>';
+  html += '<div class="stat-row"><span class="stat-label">Last Entry</span><span class="stat-value">' + fmtDate(data.lastEntry) + ' ' + fmtTime(data.lastEntry) + '</span></div>';
+
+  // Decision breakdown
+  if (data.decisions) {
+    html += '<div style="margin-top:12px;font-size:0.75rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Decisions</div>';
+    var dKeys = Object.keys(data.decisions);
+    for (var i = 0; i < dKeys.length; i++) {
+      var dk = dKeys[i];
+      var dBadge = dk === 'NO_TRADE' ? 'badge-purple' : (dk === 'TRADE' ? 'badge-green' : 'badge-dim');
+      html += '<div class="stat-row"><span class="stat-label"><span class="badge ' + dBadge + '">' + escHtml(dk) + '</span></span><span class="stat-value">' + data.decisions[dk] + '</span></div>';
+    }
+  }
+
+  var el = document.getElementById('ledger-body');
+  el.innerHTML = html;
+  el.classList.remove('fade-update');
+  void el.offsetWidth;
+  el.classList.add('fade-update');
+}
+
+// ── Panel 4: System Health ────────────────────────────────────────────────
+
+function renderHealth(data) {
+  document.getElementById('health-ts').textContent = fmtTime(data.generated_at);
+
+  var overall = data.overall_health || '--';
+  var overallBadge = overall === 'HEALTHY' ? 'badge-green' : (overall === 'DEGRADED' ? 'badge-yellow' : 'badge-red');
+
+  var html = '<div style="text-align:center;margin-bottom:14px;">'
+    + '<span class="badge badge-lg ' + overallBadge + '">' + escHtml(overall) + '</span>'
+    + '</div>';
+
+  // Summary
+  if (data.summary) {
+    html += '<div class="reason-text" style="margin-bottom:14px;">' + escHtml(data.summary) + '</div>';
+  }
+
+  // Components
+  var comps = data.components || {};
+  var compOrder = ['regime_engine', 'granger_pipeline', 'circuit_breaker'];
+  var compLabels = { regime_engine: 'Regime Engine', granger_pipeline: 'Granger Pipeline', circuit_breaker: 'Circuit Breaker' };
+
+  for (var i = 0; i < compOrder.length; i++) {
+    var cKey = compOrder[i];
+    var c = comps[cKey];
+    if (!c) continue;
+
+    var cBadge = c.state === 'HEALTHY' ? 'badge-green' : (c.state === 'DEGRADED' ? 'badge-yellow' : 'badge-red');
+    var borderColor = c.state === 'HEALTHY' ? 'var(--green)' : (c.state === 'DEGRADED' ? 'var(--yellow)' : 'var(--red)');
+
+    html += '<div class="component-row" style="border-left:3px solid ' + borderColor + '">';
+    html += '<div class="component-header">';
+    html += '<span class="component-name">' + escHtml(compLabels[cKey] || cKey) + '</span>';
+    html += '<span class="badge ' + cBadge + '">' + escHtml(c.state) + '</span>';
+    html += '</div>';
+    html += '<div class="component-msg">' + escHtml(c.message) + '</div>';
+    html += '</div>';
+  }
+
+  var el = document.getElementById('health-body');
+  el.innerHTML = html;
+  el.classList.remove('fade-update');
+  void el.offsetWidth;
+  el.classList.add('fade-update');
+}
+
+// ── Panel 5: Regime Timeline ──────────────────────────────────────────────
+
+function renderTimeline(data) {
+  document.getElementById('timeline-ts').textContent = fmtTime(data.timestamp);
+
+  var currentRegime = data.currentRegime || '--';
+  var transitions = data.transitions || [];
+  var transitionCount = data.transitionCount || 0;
+
+  var html = '<div class="stat-row"><span class="stat-label">Current Regime</span><span class="stat-value"><span class="badge" style="' + regimeBadgeStyle(currentRegime) + '">' + escHtml(currentRegime) + '</span></span></div>';
+  html += '<div class="stat-row" style="margin-bottom:12px"><span class="stat-label">Transitions (90d)</span><span class="stat-value">' + transitionCount + '</span></div>';
+
+  // Visual timeline bar
+  if (transitions.length > 0) {
+    html += renderTimelineBar(transitions);
+  }
+
+  // Transition list
+  html += '<div style="margin-top:12px;font-size:0.75rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Transition Log</div>';
+  html += '<div class="transition-list">';
+
+  for (var i = transitions.length - 1; i >= 0; i--) {
+    var tr = transitions[i];
+    var fromLabel = tr.transitionFrom || 'INIT';
+    html += '<div class="transition-item">';
+    html += '<span class="transition-date">' + escHtml(tr.date) + '</span>';
+    html += '<span class="badge badge-dim" style="font-size:0.65rem;">' + escHtml(fromLabel) + '</span>';
+    html += '<span class="transition-arrow">&rarr;</span>';
+    html += '<span class="badge" style="font-size:0.65rem;' + regimeBadgeStyle(tr.regime) + '">' + escHtml(tr.regime) + '</span>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+
+  var el = document.getElementById('timeline-body');
+  el.innerHTML = html;
+  el.classList.remove('fade-update');
+  void el.offsetWidth;
+  el.classList.add('fade-update');
+}
+
+function renderTimelineBar(transitions) {
+  if (transitions.length === 0) return '';
+
+  // Calculate durations between transitions
+  var now = new Date();
+  var segments = [];
+  for (var i = 0; i < transitions.length; i++) {
+    var start = new Date(transitions[i].date);
+    var end = (i < transitions.length - 1) ? new Date(transitions[i + 1].date) : now;
+    var days = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)));
+    segments.push({ regime: transitions[i].regime, days: days });
+  }
+
+  var totalDays = segments.reduce(function (sum, s) { return sum + s.days; }, 0);
+  if (totalDays === 0) totalDays = 1;
+
+  var html = '<div class="timeline-bar">';
+  for (var i = 0; i < segments.length; i++) {
+    var pct = (segments[i].days / totalDays) * 100;
+    var bg = regimeColor(segments[i].regime);
+    var fg = regimeTextColor(segments[i].regime);
+    html += '<div class="timeline-segment" style="flex-basis:' + pct.toFixed(1) + '%;background:' + bg + ';color:' + fg + '">';
+    if (pct > 8) {
+      html += escHtml(segments[i].regime);
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+
+  return html;
+}
+
+// ── Panel 6: Consumer Activity ────────────────────────────────────────────
+
+function renderConsumer(data) {
+  document.getElementById('consumer-ts').textContent = fmtTime(data.timestamp);
+
+  var extReqs = data.externalRequests || 0;
+  var uniqueConsumers = data.uniqueConsumers || 0;
+  var uptime = data.serverUptime || 0;
+
+  var html = '<div style="display:flex;gap:16px;margin-bottom:12px;">';
+  html += '<div><span class="big-number" style="font-size:1.8rem;color:var(--accent-blue)">' + extReqs + '</span><div style="font-size:0.7rem;color:var(--text-dim);">External Requests</div></div>';
+  html += '<div><span class="big-number" style="font-size:1.8rem;color:var(--green-bright)">' + uniqueConsumers + '</span><div style="font-size:0.7rem;color:var(--text-dim);">Unique Consumers</div></div>';
+  html += '</div>';
+
+  html += '<div class="stat-row"><span class="stat-label">Server Uptime</span><span class="stat-value">' + fmtUptime(uptime) + '</span></div>';
+
+  // Last external request
+  if (data.lastExternalRequest) {
+    var lr = data.lastExternalRequest;
+    html += '<div class="stat-row"><span class="stat-label">Last External</span><span class="stat-value">' + fmtTime(lr.time) + ' &nbsp;<span style="color:var(--accent-blue)">' + escHtml(lr.path) + '</span></span></div>';
+  }
+
+  // Endpoint breakdown chart
+  var breakdown = data.endpointBreakdown || {};
+  var bKeys = Object.keys(breakdown);
+  if (bKeys.length > 0) {
+    html += '<div style="margin-top:12px;font-size:0.75rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Endpoint Breakdown</div>';
+
+    var maxCount = 0;
+    for (var i = 0; i < bKeys.length; i++) {
+      if (breakdown[bKeys[i]] > maxCount) maxCount = breakdown[bKeys[i]];
+    }
+    if (maxCount === 0) maxCount = 1;
+
+    // Sort by count descending
+    bKeys.sort(function (a, b) { return breakdown[b] - breakdown[a]; });
+
+    html += '<div class="mini-bar-chart">';
+    for (var i = 0; i < bKeys.length; i++) {
+      var pct = (breakdown[bKeys[i]] / maxCount) * 100;
+      html += '<div class="mini-bar-row">';
+      html += '<span class="mini-bar-label">' + escHtml(bKeys[i]) + '</span>';
+      html += '<div class="mini-bar-track"><div class="mini-bar-fill" style="width:' + pct.toFixed(1) + '%"></div></div>';
+      html += '<span class="mini-bar-count">' + breakdown[bKeys[i]] + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // Recent external log
+  var recent = data.recentExternal || [];
+  if (recent.length > 0) {
+    html += '<div style="margin-top:12px;font-size:0.75rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Recent Requests</div>';
+    html += '<div class="request-log">';
+    for (var i = recent.length - 1; i >= 0; i--) {
+      var r = recent[i];
+      html += '<div class="request-log-entry">';
+      html += '<span class="time">' + fmtTime(r.time) + '</span> ';
+      html += '<span class="method">' + escHtml(r.method) + '</span> ';
+      html += '<span class="path">' + escHtml(r.path) + '</span> ';
+      html += '<span class="status">' + (r.status || '') + '</span> ';
+      html += '<span style="color:var(--text-dim)">' + escHtml(r.source || '') + '</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  var el = document.getElementById('consumer-body');
+  el.innerHTML = html;
+  el.classList.remove('fade-update');
+  void el.offsetWidth;
+  el.classList.add('fade-update');
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+//  MAIN POLLING LOOP
+// ══════════════════════════════════════════════════════════════════════════
+
+async function fetchAll() {
+  var anySuccess = false;
+
+  // Fetch all 6 endpoints in parallel
+  var endpoints = [
+    { path: '/signals/filtered', render: renderDecision, bodyId: 'decision-body' },
+    { path: '/regime/current',   render: renderProximity, bodyId: 'proximity-body' },
+    { path: '/ledger/summary',   render: renderLedger,    bodyId: 'ledger-body' },
+    { path: '/system/status',    render: renderHealth,    bodyId: 'health-body' },
+    { path: '/regime/history',   render: renderTimeline,  bodyId: 'timeline-body' },
+    { path: '/consumer/activity', render: renderConsumer, bodyId: 'consumer-body' }
+  ];
+
+  var results = await Promise.allSettled(
+    endpoints.map(function (ep) { return fetchJSON(ep.path); })
+  );
+
+  for (var i = 0; i < results.length; i++) {
+    if (results[i].status === 'fulfilled') {
+      anySuccess = true;
+      try {
+        endpoints[i].render(results[i].value);
+      } catch (renderErr) {
+        console.error('Render error for ' + endpoints[i].path + ':', renderErr);
+        document.getElementById(endpoints[i].bodyId).innerHTML = '<div class="card-error">Render error: ' + escHtml(renderErr.message) + '</div>';
+      }
+    } else {
+      // Only show error if we have never loaded this panel
+      var body = document.getElementById(endpoints[i].bodyId);
+      var hasSkeleton = body.querySelector('.skeleton');
+      if (hasSkeleton) {
+        body.innerHTML = '<div class="card-error">Failed to load: ' + escHtml(results[i].reason ? results[i].reason.message : 'Unknown error') + '</div>';
+      }
+      // If panel already has data, keep showing it (graceful degradation)
+    }
+  }
+
+  if (anySuccess) {
+    setConnected(true);
+    lastFetchTime = Date.now();
+  } else {
+    setConnected(false);
+  }
+
+  startCountdown();
+}
+
+// ── Initial load + polling ────────────────────────────────────────────────
+
+(async function init() {
+  // Initial fetch
+  await fetchAll();
+
+  // Poll every 60 seconds
+  setInterval(async function () {
+    await fetchAll();
+  }, POLL_INTERVAL_MS);
+})();
+</script>
+</body>
+</html>
