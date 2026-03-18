@@ -1,78 +1,24 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-03-18T21:45:01Z",
+  "generated_at": "2026-03-18T22:15:01Z",
   "overall_health": "HALT",
-  "summary": "Signal integrity issue detected in: granger_pipeline. This is a safe halt \u2014 the system is correctly preventing reliance on potentially unreliable signals. This does NOT mean the infrastructure is broken. It means current market conditions or data quality do not meet the thresholds required for confident signal generation. Check component messages for details.",
+  "summary": "The Signal Intelligence API is currently unreachable. This means health checks cannot be performed and signals are unavailable. Error: ConnectionError: Health check failed: [Errno 111] Connection refused",
   "components": {
     "regime_engine": {
-      "state": "DEGRADED",
-      "message": "Regime alert is active, indicating the market regime may be shifting. Signal classifications should be treated with extra caution.",
-      "details": {
-        "regime": "SYSTEMIC",
-        "regime_label": "Systemic Risk-Off",
-        "confidence": 77,
-        "is_alert": true,
-        "regime_implication": "SYSTEMIC regime is active. All signal types are suppressed by the regime filter. This is expected behavior during broad market stress \u2014 the system is correctly blocking trades that historically lose money in this environment.",
-        "actionable_signals": 0,
-        "suppressed_signals": 17,
-        "total_signals": 17
-      }
+      "state": "HALT",
+      "message": "Cannot evaluate \u2014 API unreachable.",
+      "details": {}
     },
     "granger_pipeline": {
       "state": "HALT",
-      "message": "3 of 3 signal types are decaying (SEMI_LEADS, CRYPTO_LEADS, FULL_DECOUPLE). This means the historical correlations that power the trading signals have weakened significantly. The system is correctly halting to prevent trades based on unreliable statistical relationships. CRYPTO_LEADS (the primary tradeable signal) has dropped 50.6% from its all-time score. This exceeds the 40% halt threshold. The semi-to-crypto lead-lag relationship that underpins the core trading edge may no longer be intact. Regime alert triggered \u2014 multiple signal types decaying simultaneously suggests a structural shift in market correlations.",
-      "details": {
-        "signal_types": {
-          "SEMI_LEADS": {
-            "label": "Semi Leads",
-            "score": 68,
-            "all_time_score": 68,
-            "current_rolling": 38,
-            "drop_pct": 44.1,
-            "is_decaying": true,
-            "freshness": "Stale"
-          },
-          "CRYPTO_LEADS": {
-            "label": "Crypto Leads",
-            "score": 85,
-            "all_time_score": 85,
-            "current_rolling": 42,
-            "drop_pct": 50.6,
-            "is_decaying": true,
-            "freshness": "Stale"
-          },
-          "FULL_DECOUPLE": {
-            "label": "Full Decouple",
-            "score": 75,
-            "all_time_score": 75,
-            "current_rolling": 39,
-            "drop_pct": 48,
-            "is_decaying": true,
-            "freshness": "Stale"
-          }
-        },
-        "decaying_count": 3,
-        "decaying_types": [
-          "SEMI_LEADS",
-          "CRYPTO_LEADS",
-          "FULL_DECOUPLE"
-        ],
-        "primary_signal_drop": 50.6,
-        "primary_signal_freshness": "Stale",
-        "regime_alert": true
-      }
+      "message": "Cannot evaluate \u2014 API unreachable.",
+      "details": {}
     },
     "circuit_breaker": {
-      "state": "HEALTHY",
-      "message": "Circuit breaker is operational. API is responding, data is fresh, and no errors have been recorded.",
+      "state": "HALT",
+      "message": "API unreachable: ConnectionError: Health check failed: [Errno 111] Connection refused",
       "details": {
-        "api_status": "ok",
-        "uptime_seconds": 25637,
-        "data_age_seconds": 429,
-        "is_stale": false,
-        "last_error": null,
-        "refresh_count": 29,
-        "schema_version": "1.1.0"
+        "api_status": "unreachable"
       }
     }
   },
