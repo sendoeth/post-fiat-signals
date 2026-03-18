@@ -30,6 +30,82 @@ def _ts():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _regime_proximity_neutral():
+    """Proximity data for NEUTRAL regime — already at target, score ~1.0."""
+    return {
+        "score": 1.0,
+        "label": "AT_NEUTRAL",
+        "scale": "0.0 = deep SYSTEMIC, 1.0 = transition imminent",
+        "regime": "NEUTRAL",
+        "regimeDurationDays": 45,
+        "transitionsNeeded": 0,
+        "leader": {
+            "type": "CRYPTO_LEADS", "label": "Crypto Leads",
+            "dropPct": 3.3, "distanceToThreshold": 0.0,
+            "recoveryScore": 1.0, "velocity": 0.01, "velocityLabel": "STABLE",
+        },
+        "bottleneck": {
+            "type": "FULL_DECOUPLE", "label": "Full Decouple",
+            "dropPct": 12.9, "distanceToThreshold": 0.0,
+            "recoveryScore": 1.0, "velocity": 0.0, "velocityLabel": "STABLE",
+        },
+        "perType": {
+            "CRYPTO_LEADS": {
+                "dropPct": 3.3, "distanceToThreshold": 0.0,
+                "recoveryScore": 1.0, "velocity": 0.01, "velocityLabel": "STABLE", "isDecaying": False,
+            },
+            "FULL_DECOUPLE": {
+                "dropPct": 12.9, "distanceToThreshold": 0.0,
+                "recoveryScore": 1.0, "velocity": 0.0, "velocityLabel": "STABLE", "isDecaying": False,
+            },
+            "SEMI_LEADS": {
+                "dropPct": 42.3, "distanceToThreshold": 22.3,
+                "recoveryScore": 0.257, "velocity": -0.12, "velocityLabel": "DETERIORATING", "isDecaying": True,
+            },
+        },
+        "ifLeaderRecovers": "NEUTRAL",
+        "interpretation": "Regime is NEUTRAL — signals are live and actionable. No transition needed.",
+    }
+
+
+def _regime_proximity_systemic():
+    """Proximity data for SYSTEMIC regime — deep risk-off, all types decaying."""
+    return {
+        "score": 0.012,
+        "label": "ENTRENCHED",
+        "scale": "0.0 = deep SYSTEMIC, 1.0 = transition imminent",
+        "regime": "SYSTEMIC",
+        "regimeDurationDays": 12,
+        "transitionsNeeded": 2,
+        "leader": {
+            "type": "SEMI_LEADS", "label": "Semi Leads",
+            "dropPct": 44.1, "distanceToThreshold": 24.1,
+            "recoveryScore": 0.196, "velocity": -0.41, "velocityLabel": "DETERIORATING",
+        },
+        "bottleneck": {
+            "type": "FULL_DECOUPLE", "label": "Full Decouple",
+            "dropPct": 48.0, "distanceToThreshold": 28.0,
+            "recoveryScore": 0.067, "velocity": -0.45, "velocityLabel": "DETERIORATING",
+        },
+        "perType": {
+            "SEMI_LEADS": {
+                "dropPct": 44.1, "distanceToThreshold": 24.1,
+                "recoveryScore": 0.196, "velocity": -0.41, "velocityLabel": "DETERIORATING", "isDecaying": True,
+            },
+            "FULL_DECOUPLE": {
+                "dropPct": 48.0, "distanceToThreshold": 28.0,
+                "recoveryScore": 0.067, "velocity": -0.45, "velocityLabel": "DETERIORATING", "isDecaying": True,
+            },
+            "CRYPTO_LEADS": {
+                "dropPct": 50.6, "distanceToThreshold": 30.6,
+                "recoveryScore": 0.0, "velocity": -0.47, "velocityLabel": "DETERIORATING", "isDecaying": True,
+            },
+        },
+        "ifLeaderRecovers": "EARNINGS",
+        "interpretation": "All 3 signal types are significantly below their all-time reliability scores. The system is deeply entrenched in SYSTEMIC. Recovery requires at least 2 types to rebuild above the 20% decay threshold — typically weeks of sustained market stabilization.",
+    }
+
+
 def regime_current():
     return {
         "state": "NEUTRAL",
@@ -70,6 +146,7 @@ def regime_current():
             "avgLeadTime": 27.0,
             "fpRate": 40,
         },
+        "regimeProximity": _regime_proximity_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -176,6 +253,7 @@ def signals_filtered():
     return {
         "decision": "TRADE",
         "decisionReason": "NEUTRAL regime — 2 actionable signals (CRYPTO_LEADS). Hit rate 82% with 8.2% avg return under this regime.",
+        "regimeProximity": _regime_proximity_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
