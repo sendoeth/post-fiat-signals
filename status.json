@@ -1,6 +1,6 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-03-18T22:15:01Z",
+  "generated_at": "2026-03-18T22:30:01Z",
   "overall_health": "HALT",
   "summary": "The Signal Intelligence API is currently unreachable. This means health checks cannot be performed and signals are unavailable. Error: ConnectionError: Health check failed: [Errno 111] Connection refused",
   "components": {
