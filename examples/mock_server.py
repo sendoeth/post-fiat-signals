@@ -240,6 +240,8 @@ def regime_current():
         },
         "regimeProximity": _regime_proximity_neutral(),
         "transitionForecast": _transition_forecast_neutral(),
+        "hitRateDecayModel": _hit_rate_decay_neutral(),
+        "capitalPreservation": _capital_preservation_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -471,6 +473,99 @@ def _hit_rate_decay_systemic():
     }
 
 
+def _capital_preservation_neutral():
+    return {
+        "status": "AT_NEUTRAL",
+        "message": "Capital preservation model only active during SYSTEMIC regime with decay model running.",
+    }
+
+def _capital_preservation_systemic():
+    return {
+        "status": "ACTIVE",
+        "modelVersion": "counterfactual-pnl-v1",
+        "methodology": "Cross-regime decomposition solves for per-type win/loss returns using NEUTRAL and SYSTEMIC (hitRate, avgReturn) as simultaneous equations. Duration-decayed hit rates from hitRateDecayModel compute adjusted expected returns at each NO_TRADE entry timestamp. counterfactualLoss = negative of adjusted expected return (positive = loss avoided by not trading).",
+        "regimeDurationDays": 12,
+        "regimeStartEstimate": "2025-11-06",
+        "noTradeEntriesEvaluated": 48,
+        "liveEntriesEvaluated": 40,
+        "backfilledEntriesEvaluated": 8,
+        "dateRange": {"first": "2025-11-07T00:16:01Z", "last": "2025-11-18T23:46:02Z"},
+        "aggregate": {
+            "totalDrawdownAvoided": 540.96,
+            "avgCounterfactualLossPerEntry": 11.27,
+            "liveAvgCounterfactualLoss": 11.35,
+            "worstSingleEntry": 11.75,
+            "bestSingleEntry": 9.20,
+            "independentTradeWindows": 0.86,
+            "positionAdjustedDrawdown": 9.69,
+            "unit": "percent — expected 14-day return per equal-weight signal portfolio"
+        },
+        "perType": {
+            "CRYPTO_LEADS": {
+                "label": "Crypto Leads",
+                "decomposition": {"winReturn": 13.48, "lossReturn": -15.62},
+                "staticExpectedReturn": -9.80,
+                "adjustedExpectedReturn": -12.50,
+                "staticVsAdjustedBias": -21.6,
+                "signalCount": 8,
+                "weight": 0.471,
+                "sampleSize": {"neutral": 17, "systemic": 5}
+            },
+            "SEMI_LEADS": {
+                "label": "Semi Leads",
+                "decomposition": {"winReturn": -14.60, "lossReturn": -14.60},
+                "staticExpectedReturn": -14.60,
+                "adjustedExpectedReturn": -14.60,
+                "staticVsAdjustedBias": 0,
+                "signalCount": 3,
+                "weight": 0.176,
+                "sampleSize": {"neutral": 8, "systemic": 10}
+            },
+            "FULL_DECOUPLE": {
+                "label": "Full Decouple",
+                "decomposition": {"winReturn": -3.05, "lossReturn": -10.05},
+                "staticExpectedReturn": -8.30,
+                "adjustedExpectedReturn": -8.70,
+                "staticVsAdjustedBias": -4.6,
+                "signalCount": 6,
+                "weight": 0.353,
+                "sampleSize": {"neutral": 6, "systemic": 4}
+            }
+        },
+        "inverseSignal": {
+            "type": "CRYPTO_LEADS",
+            "regimeDay": 12,
+            "adjustedHitRate": 0.1124,
+            "longExpectedReturn": -12.50,
+            "shortExpectedReturn": 12.50,
+            "viability": "MARGINAL",
+            "rationale": "At day 12 of SYSTEMIC, CRYPTO_LEADS long side has 11.2% hit rate. Short expected return of 12.50%.",
+            "limitations": ["Only n=5 SYSTEMIC observations."]
+        },
+        "sampleEntries": [
+            {
+                "cycle_key": "2025-11-18T23:30:00Z",
+                "timestamp": "2025-11-18T23:31:01Z",
+                "regimeDay": 12.0,
+                "counterfactualLoss": 11.27,
+                "expectedReturnIfTraded": -11.27,
+                "breakdown": {
+                    "CRYPTO_LEADS": {"adjustedConfidence": 0.1124, "adjustedExpectedReturn": -12.50, "weight": 0.471},
+                    "SEMI_LEADS": {"adjustedConfidence": 0.0920, "adjustedExpectedReturn": -14.60, "weight": 0.176},
+                    "FULL_DECOUPLE": {"adjustedConfidence": 0.1900, "adjustedExpectedReturn": -8.70, "weight": 0.353}
+                }
+            }
+        ],
+        "calibration": {
+            "crossRegimeMethod": "Solves N*Rw+(1-N)*Rl=Rn and S*Rw+(1-S)*Rl=Rs per signal type.",
+            "decayDependency": "Inherits all limitations of hitRateDecayModel.",
+            "limitations": [
+                "Win/loss return magnitudes assumed regime-invariant.",
+                "Entries are NOT independent — 14d horizon with 15-min cycles."
+            ]
+        }
+    }
+
 def signals_filtered():
     return {
         "decision": "TRADE",
@@ -478,6 +573,7 @@ def signals_filtered():
         "regimeProximity": _regime_proximity_neutral(),
         "transitionForecast": _transition_forecast_neutral(),
         "hitRateDecayModel": _hit_rate_decay_neutral(),
+        "capitalPreservation": _capital_preservation_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
