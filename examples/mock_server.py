@@ -243,6 +243,7 @@ def regime_current():
         "hitRateDecayModel": _hit_rate_decay_neutral(),
         "capitalPreservation": _capital_preservation_neutral(),
         "optimalReEntry": _optimal_reentry_neutral(),
+        "parameterUncertainty": _parameter_uncertainty_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -762,6 +763,107 @@ def _capital_preservation_systemic():
         }
     }
 
+def _parameter_uncertainty_neutral():
+    return {
+        "status": "AT_NEUTRAL",
+        "modelVersion": "parameter-uncertainty-v1",
+        "message": "Parameter uncertainty propagation not active during NEUTRAL regime — upstream models report point estimates directly.",
+    }
+
+def _parameter_uncertainty_systemic():
+    return {
+        "status": "ACTIVE",
+        "modelVersion": "parameter-uncertainty-v1",
+        "message": "Parameter uncertainty propagation active. Regime day 13. Dominant uncertainty source: transition timing (n=2 historical periods). 0/7 parameter scenarios achieve aggregate crossover.",
+        "methodology": "Wilson score intervals on binomial hit rates, t-distribution CIs on transition duration (df=1), scenario-based propagation through E[R|d].",
+        "regimeDurationDays": 13,
+        "parameterCIs": {
+            "CRYPTO_LEADS": {
+                "label": "Crypto Leads",
+                "neutralHitRate": {"point": 0.82, "ci95": {"lower": 0.5897, "upper": 0.9381, "center": 0.7639}, "n": 17},
+                "systemicHitRate": {"point": 0.2, "ci95": {"lower": 0.0362, "upper": 0.6245, "center": 0.3303}, "n": 5},
+                "neutralAvgReturn": {"point": 8.24, "ci95": {"lower": 2.36, "upper": 14.12, "center": 8.24}, "n": 17},
+                "systemicAvgReturn": {"point": -9.8, "ci95": {"lower": -28.05, "upper": 8.45, "center": -9.8}, "n": 5},
+                "decomposition": {"winReturn": {"lower": -204.46, "upper": 13.48, "point": 13.48}, "lossReturn": {"lower": -15.62, "upper": 313.94, "point": -15.62}},
+            },
+            "SEMI_LEADS": {
+                "label": "Semi Leads",
+                "neutralHitRate": {"point": 0.12, "ci95": {"lower": 0.0224, "upper": 0.4709, "center": 0.2467}, "n": 8},
+                "systemicHitRate": {"point": 0.1, "ci95": {"lower": 0.0179, "upper": 0.4042, "center": 0.211}, "n": 10},
+                "neutralAvgReturn": {"point": -14.6, "ci95": {"lower": -32.11, "upper": 2.91, "center": -14.6}, "n": 8},
+                "systemicAvgReturn": {"point": -14.6, "ci95": {"lower": -30.27, "upper": 1.07, "center": -14.6}, "n": 10},
+                "decomposition": {"winReturn": {"lower": -14.6, "upper": -14.6, "point": -14.6}, "lossReturn": {"lower": -14.6, "upper": -14.6, "point": -14.6}},
+            },
+            "FULL_DECOUPLE": {
+                "label": "Full Decouple",
+                "neutralHitRate": {"point": 0.5, "ci95": {"lower": 0.1876, "upper": 0.8124, "center": 0.5}, "n": 6},
+                "systemicHitRate": {"point": 0.25, "ci95": {"lower": 0.0456, "upper": 0.6994, "center": 0.3725}, "n": 4},
+                "neutralAvgReturn": {"point": -6.55, "ci95": {"lower": -15.62, "upper": 2.52, "center": -6.55}, "n": 6},
+                "systemicAvgReturn": {"point": -8.3, "ci95": {"lower": -25.58, "upper": 8.98, "center": -8.3}, "n": 4},
+                "decomposition": {"winReturn": {"lower": -9.33, "upper": -3.05, "point": -3.05}, "lossReturn": {"lower": -10.05, "upper": -5.91, "point": -10.05}},
+            },
+            "_transitionDuration": {
+                "label": "SYSTEMIC Period Duration",
+                "observedDurations": [13, 4],
+                "ci95": {"lower": 1, "upper": 65.7, "center": 8.5, "n": 2, "sampleStdDev": 6.36, "standardError": 4.5, "tCritical": 12.706},
+            },
+        },
+        "propagatedOutputCIs": {
+            "description": "Per-day 95% CI on expected return, computed across 7 parameter scenarios.",
+            "riskFreeRate14d": 0.151,
+            "curve": [
+                {"day": 0, "regimeDay": 13, "aggregate": {"pointEstimateEV": -12.1, "ci95Lower": -12.1, "ci95Upper": -4.303, "ciWidth": 7.797, "probabilityProfitable": 0, "scenariosProfitable": 0, "totalScenarios": 7}, "CRYPTO_LEADS": {"pointEstimateEV": -12.862, "ci95Lower": -12.862, "ci95Upper": 8.24, "ciWidth": 21.102, "probabilityProfitable": 0.286, "scenariosProfitable": 2, "totalScenarios": 7}},
+                {"day": 7, "regimeDay": 20, "aggregate": {"pointEstimateEV": -11.186, "ci95Lower": -12.907, "ci95Upper": -4.303, "ciWidth": 8.604, "probabilityProfitable": 0, "scenariosProfitable": 0, "totalScenarios": 7}, "CRYPTO_LEADS": {"pointEstimateEV": -10.157, "ci95Lower": -14.757, "ci95Upper": 8.24, "ciWidth": 22.997, "probabilityProfitable": 0.571, "scenariosProfitable": 4, "totalScenarios": 7}},
+                {"day": 14, "regimeDay": 27, "aggregate": {"pointEstimateEV": -5.193, "ci95Lower": -11.424, "ci95Upper": -4.303, "ciWidth": 7.121, "probabilityProfitable": 0, "scenariosProfitable": 0, "totalScenarios": 7}, "CRYPTO_LEADS": {"pointEstimateEV": 5.881, "ci95Lower": -10.632, "ci95Upper": 8.24, "ciWidth": 18.872, "probabilityProfitable": 0.857, "scenariosProfitable": 6, "totalScenarios": 7}},
+                {"day": 30, "regimeDay": 43, "aggregate": {"pointEstimateEV": -4.303, "ci95Lower": -4.303, "ci95Upper": -4.303, "ciWidth": 0, "probabilityProfitable": 0, "scenariosProfitable": 0, "totalScenarios": 7}, "CRYPTO_LEADS": {"pointEstimateEV": 8.24, "ci95Lower": 8.24, "ci95Upper": 8.24, "ciWidth": 0, "probabilityProfitable": 1, "scenariosProfitable": 7, "totalScenarios": 7}},
+            ],
+        },
+        "crossoverDayCI": {
+            "pointEstimate": None,
+            "ci95Lower": None, "ci95Upper": None,
+            "scenariosWithCrossover": 0, "totalScenarios": 7,
+            "neverCrossProbability": 1,
+            "interpretation": "No scenario achieves aggregate crossover within 30-day window.",
+            "perType": {
+                "CRYPTO_LEADS": {"label": "Crypto Leads", "pointEstimate": None, "ci95Lower": 0, "ci95Upper": 24, "scenariosEvaluated": 7, "scenariosCrossing": 7, "neverCrossProbability": 0},
+                "SEMI_LEADS": {"label": "Semi Leads", "pointEstimate": None, "ci95Lower": None, "ci95Upper": None, "scenariosEvaluated": 7, "scenariosCrossing": 0, "neverCrossProbability": 1},
+                "FULL_DECOUPLE": {"label": "Full Decouple", "pointEstimate": None, "ci95Lower": None, "ci95Upper": None, "scenariosEvaluated": 7, "scenariosCrossing": 0, "neverCrossProbability": 1},
+            },
+        },
+        "informationValue": {
+            "description": "Ranked by how much one additional observation would narrow the uncertainty.",
+            "ranking": [
+                {"parameter": "transitionDuration", "label": "SYSTEMIC period duration", "currentCI": "[1, 65.7] days", "ciWidth": 64.7, "currentN": 2, "uncertaintyReductionPct": 50, "oneMoreObservation": {"newN": 3, "newTCritical": 4.303, "estimatedNewCIWidth": 21.9, "reductionPct": 66.1}},
+                {"parameter": "FULL_DECOUPLE_hitRate", "label": "Full Decouple hit rate (SYSTEMIC)", "currentCI": "[0.0456, 0.6994]", "ciWidth": 0.6538, "currentN": 4, "uncertaintyReductionPct": 0, "oneMoreObservation": {"newN": 5, "reductionPct": 10.6}},
+                {"parameter": "CRYPTO_LEADS_hitRate", "label": "Crypto Leads hit rate (SYSTEMIC)", "currentCI": "[0.0362, 0.6245]", "ciWidth": 0.5883, "currentN": 5, "uncertaintyReductionPct": 29.2, "oneMoreObservation": {"newN": 6, "reductionPct": 8.7}},
+                {"parameter": "SEMI_LEADS_hitRate", "label": "Semi Leads hit rate (SYSTEMIC)", "currentCI": "[0.0179, 0.4042]", "ciWidth": 0.3863, "currentN": 10, "uncertaintyReductionPct": 0, "oneMoreObservation": {"newN": 11, "reductionPct": 4.7}},
+            ],
+        },
+        "effectiveSampleDiagnostic": {
+            "weakestLink": {"parameter": "transitionDuration", "currentN": 2, "ciWidth": 64.7, "reason": "With only n=2 historical SYSTEMIC periods, the transition duration 95% CI spans 64.7 days."},
+            "moduleContributions": [
+                {"module": "transitionForecast", "label": "Transition timing (n=2 periods)", "crossoverRangeContribution": 17, "uncertaintyContributionPct": 56.7, "effectiveN": 2, "bottleneck": True},
+                {"module": "hitRateDecay", "label": "Hit rate estimation (CRYPTO_LEADS n_systemic=5)", "crossoverRangeContribution": 12, "uncertaintyContributionPct": 40, "effectiveN": 5, "bottleneck": False},
+                {"module": "returnDecomposition", "label": "Return magnitude estimation", "crossoverRangeContribution": 1, "uncertaintyContributionPct": 3.3, "effectiveN": 4, "bottleneck": False},
+            ],
+            "perTypeEffectiveN": {
+                "CRYPTO_LEADS": {"systemic": 5, "neutral": 17, "effectiveMin": 5},
+                "SEMI_LEADS": {"systemic": 10, "neutral": 8, "effectiveMin": 8},
+                "FULL_DECOUPLE": {"systemic": 4, "neutral": 6, "effectiveMin": 4},
+            },
+            "overallAssessment": "Total estimation uncertainty is dominated by transition timing (n=2, 56.7% of crossover range). Hit rate uncertainty contributes 40%.",
+            "recommendation": "Prioritize evidence accumulation over model refinement.",
+        },
+        "limitations": {
+            "methodology": "Scenario-based propagation across parameter CI bounds. NOT a full Monte Carlo simulation.",
+            "returnCIHeuristic": "Return CIs estimated heuristically. Likely UNDERSTATES return uncertainty.",
+            "wilsonAssumptions": "Wilson score assumes independent Bernoulli trials.",
+            "jointUncertainty": "Parameters are varied independently.",
+            "netBias": "NET UNDERSTATED — three of four limitation factors push toward wider true CIs.",
+        },
+    }
+
+
 def signals_filtered():
     return {
         "decision": "TRADE",
@@ -771,6 +873,7 @@ def signals_filtered():
         "hitRateDecayModel": _hit_rate_decay_neutral(),
         "capitalPreservation": _capital_preservation_neutral(),
         "optimalReEntry": _optimal_reentry_neutral(),
+        "parameterUncertainty": _parameter_uncertainty_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
