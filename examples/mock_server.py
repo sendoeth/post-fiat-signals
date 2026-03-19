@@ -244,6 +244,7 @@ def regime_current():
         "capitalPreservation": _capital_preservation_neutral(),
         "optimalReEntry": _optimal_reentry_neutral(),
         "parameterUncertainty": _parameter_uncertainty_neutral(),
+        "regimeSurvival": _regime_survival_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -864,6 +865,121 @@ def _parameter_uncertainty_systemic():
     }
 
 
+def _regime_survival_neutral():
+    return {
+        "status": "AT_NEUTRAL",
+        "modelVersion": "regime-survival-v1",
+        "message": "Regime is NEUTRAL — survival model not applicable. No duration-dependent exit probability needed.",
+    }
+
+
+def _regime_survival_systemic():
+    return {
+        "status": "ACTIVE",
+        "modelVersion": "regime-survival-v1",
+        "message": "Weibull survival model active. Regime day 13. Shape k=1.7775 (WEARING_OUT). P(exit by today)=0.5866. Hazard h(13)=0.120774.",
+        "methodology": "Weibull MLE via profile likelihood. Data source: SYSTEMIC-only (n=2 completed, 1 right-censored). CIs via profile-likelihood inversion.",
+        "regimeDurationDays": 13,
+        "weibullParameters": {
+            "k": 1.7775,
+            "kInterpretation": "Shape parameter. k>1: wearing out. k<1: hardening. k=1: memoryless.",
+            "lambda": 13.94,
+            "lambdaInterpretation": "Scale parameter (characteristic life). 63.2nd percentile of duration distribution.",
+            "ci95": {
+                "k": {"lower": 0.3575, "upper": 5.0275, "method": "profile-likelihood"},
+                "lambda": {"lower": 13.54, "upper": 29.57, "method": "derived-from-k-profile"},
+            },
+            "fittingMethod": "profile-mle",
+            "converged": True,
+            "logLikelihood": -7.1437,
+            "dataSource": "SYSTEMIC-only",
+            "nCompleted": 2,
+            "nCensored": 1,
+            "observedDurations": [13, 4],
+            "observedDurationsByType": {"DIVERGENCE": [5], "SYSTEMIC": [13, 4], "EARNINGS": [14, 5]},
+        },
+        "currentDay": {
+            "hazardRate": 0.120774,
+            "hazardInterpretation": "Instantaneous exit probability density at day 13.",
+            "survivalProbability": 0.4134,
+            "survivalInterpretation": "P(regime lasts at least 13 days) = 0.4134.",
+            "cumulativeExitProbability": 0.5866,
+            "exitProbInterpretation": "P(regime has ended by day 13) = 0.5866.",
+            "medianRemainingDays": {
+                "base": 5.8,
+                "optimistic": 1.5,
+                "pessimistic": 78.2,
+                "interpretation": "Conditional on having survived 13 days, the median remaining duration is 5.8 days (base).",
+            },
+        },
+        "durationDependence": {
+            "type": "WEARING_OUT",
+            "label": "Weakly positive duration dependence — point estimate suggests wearing out, but CI includes memoryless",
+            "confidence": "not_significant",
+            "interpretation": "Shape parameter k=1.78 with 95% CI [0.36, 5.03] spans 1.0 — cannot reject memoryless null.",
+            "duration_dependence_interpretation": "k>1 (wearing out): regime becomes MORE likely to end as duration increases",
+        },
+        "hazardCurve": {
+            "description": "Hazard rate h(t), survival S(t), and cumulative exit probability F(t) at sample days.",
+            "points": [
+                {"day": 1, "hazardRate": 0.016439, "survivalProb": 0.9908, "cumulativeExitProb": 0.0092, "uniformExitProb": 0},
+                {"day": 4, "hazardRate": 0.048304, "survivalProb": 0.897, "cumulativeExitProb": 0.103, "uniformExitProb": 0},
+                {"day": 7, "hazardRate": 0.074636, "survivalProb": 0.7453, "cumulativeExitProb": 0.2547, "uniformExitProb": 0.3333},
+                {"day": 10, "hazardRate": 0.098488, "survivalProb": 0.5746, "cumulativeExitProb": 0.4254, "uniformExitProb": 0.6667},
+                {"day": 13, "hazardRate": 0.120774, "survivalProb": 0.4134, "cumulativeExitProb": 0.5866, "uniformExitProb": 1},
+                {"day": 14, "hazardRate": 0.127937, "survivalProb": 0.3651, "cumulativeExitProb": 0.6349, "uniformExitProb": 1},
+                {"day": 20, "hazardRate": 0.168824, "survivalProb": 0.1496, "cumulativeExitProb": 0.8504, "uniformExitProb": 1},
+                {"day": 30, "hazardRate": 0.230567, "survivalProb": 0.0195, "cumulativeExitProb": 0.9805, "uniformExitProb": 1},
+            ],
+        },
+        "sensitivityBands": {
+            "optimistic": {"label": "k=5.03 (stronger wearing-out)", "k": 5.0275, "lambda": 13.54, "pExitCurrentDay": 0.6423, "hazardCurrentDay": 0.371, "medianDuration": 12.6},
+            "base": {"label": "k=1.78 (MLE point estimate)", "k": 1.7775, "lambda": 13.94, "pExitCurrentDay": 0.5866, "hazardCurrentDay": 0.1208, "medianDuration": 11.3},
+            "pessimistic": {"label": "k=0.36 (hardening)", "k": 0.3575, "lambda": 29.57, "pExitCurrentDay": 0.5149, "hazardCurrentDay": 0.0194, "medianDuration": 10.6},
+        },
+        "modelComparison": {
+            "systemicOnly": {"k": 1.7775, "lambda": 13.94, "n": 2, "logLik": -7.1437},
+            "pooledNonNeutral": {"k": 1.886, "lambda": 11.14, "n": 5, "logLik": -15.8701},
+            "selected": "SYSTEMIC-only",
+            "rationale": "SYSTEMIC-only preferred when n>=2.",
+        },
+        "backtestValidation": {
+            "transitions": [
+                {"regime": "DIVERGENCE", "entryDate": "2025-10-24", "exitDate": "2025-10-29", "durationDays": 5, "predicted": {"weibull": {"pExit": 0.15, "brierComponent": 0.7225}, "uniform": {"pExit": 0.1, "brierComponent": 0.81}}, "observed": 1, "weibullBetter": True},
+                {"regime": "SYSTEMIC", "entryDate": "2025-11-06", "exitDate": "2025-11-19", "durationDays": 13, "predicted": {"weibull": {"pExit": 0.7579, "brierComponent": 0.0586}, "uniform": {"pExit": 0.9, "brierComponent": 0.01}}, "observed": 1, "weibullBetter": False},
+                {"regime": "SYSTEMIC", "entryDate": "2025-11-24", "exitDate": "2025-11-28", "durationDays": 4, "predicted": {"weibull": {"pExit": 0.0759, "brierComponent": 0.854}, "uniform": {"pExit": 0, "brierComponent": 1}}, "observed": 1, "weibullBetter": True},
+                {"regime": "EARNINGS", "entryDate": "2026-01-13", "exitDate": "2026-01-27", "durationDays": 14, "predicted": {"weibull": {"pExit": 0.816, "brierComponent": 0.0339}, "uniform": {"pExit": 1, "brierComponent": 0}}, "observed": 1, "weibullBetter": False},
+                {"regime": "EARNINGS", "entryDate": "2026-01-30", "exitDate": "2026-02-04", "durationDays": 5, "predicted": {"weibull": {"pExit": 0.15, "brierComponent": 0.7225}, "uniform": {"pExit": 0.1, "brierComponent": 0.81}}, "observed": 1, "weibullBetter": True},
+                {"regime": "SYSTEMIC", "entryDate": "2026-03-06", "exitDate": None, "durationDays": 13, "predicted": {"weibull": {"pSurvive": 0.4134, "pExit": 0.5866}, "uniform": {"pExit": 1}}, "observed": None, "rightCensored": True, "note": "Ongoing regime."},
+            ],
+            "summary": {
+                "completedPeriods": 5,
+                "rightCensoredPeriods": 1,
+                "avgBrierWeibull": 0.4783,
+                "avgBrierUniform": 0.526,
+                "brierImprovement": 9.1,
+                "weibullWins": 3,
+                "uniformWins": 2,
+                "verdict": "WEIBULL_BETTER",
+            },
+        },
+        "uniformComparison": {
+            "description": "The existing re-entry model uses uniform CDF between optimistic and pessimistic bounds.",
+            "uniformPExitCurrentDay": 1,
+            "weibullPExitCurrentDay": 0.5866,
+            "divergence": 0.4134,
+            "recommendation": "Weibull assigns LOWER exit probability than uniform. Uniform saturates at 1.0 beyond longest observed duration (13d).",
+        },
+        "limitations": {
+            "sampleSize": "n=5 completed non-NEUTRAL periods (2 SYSTEMIC). Weibull MLE with n<10 has substantial estimation error.",
+            "poolingAssumption": "Using SYSTEMIC-only sample (n=2). Excluding EARNINGS/DIVERGENCE preserves specificity but reduces n.",
+            "rightCensoring": "Current SYSTEMIC period (13 days) is right-censored. If true duration is much longer, fit UNDERSTATES lambda.",
+            "stationarity": "Assumes regime duration distribution is stationary. Direction: UNCERTAIN.",
+            "netBias": "NET BIAS: OPTIMISTIC — right-censoring and small-sample error both push P(exit) upward.",
+        },
+    }
+
+
 def signals_filtered():
     return {
         "decision": "TRADE",
@@ -874,6 +990,7 @@ def signals_filtered():
         "capitalPreservation": _capital_preservation_neutral(),
         "optimalReEntry": _optimal_reentry_neutral(),
         "parameterUncertainty": _parameter_uncertainty_neutral(),
+        "regimeSurvival": _regime_survival_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
