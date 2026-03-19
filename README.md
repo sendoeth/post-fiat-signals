@@ -18,6 +18,10 @@ Live endpoint: `GET http://<your-server-ip>:8080/system/status` — same schema,
 
 `GET /regime/current` includes a `transitionForecast` object that estimates when the current SYSTEMIC regime will end. Uses velocity-based forward projection with historical calibration from observed SYSTEMIC periods. Outputs confidence bands (optimistic/base/pessimistic), per-type recovery requirements, and backtest validation against past transitions. See [`docs/TRANSITION_FORECAST.md`](docs/TRANSITION_FORECAST.md) for the full algorithm, field reference, and consumer usage patterns.
 
+## Hit Rate Decay Model
+
+`GET /signals/filtered` and `GET /regime/current` include a `hitRateDecayModel` object that applies duration-conditioned exponential decay to signal hit rates under SYSTEMIC regime. Static aggregate hit rates are duration-blind — they overstate the current hit probability during extended SYSTEMIC periods. The decay model corrects this by computing `adjustedConfidence` per signal type using calibrated half-lives (CRYPTO_LEADS ~4.2d, FULL_DECOUPLE ~8.5d, SEMI_LEADS ~32d). Each signal also carries per-signal `adjustedConfidence`, `decayHalfLifeDays`, and `daysToNoise` fields. Includes sensitivity bands (±30% half-life), backtest calibration table, and aggregate bias detection. See [`docs/HIT_RATE_DECAY.md`](docs/HIT_RATE_DECAY.md) for the full model derivation, API field reference, and b1e55ed SPI mapping.
+
 ## Forward-Test Audit Dashboard
 
 **[Live Dashboard](https://sendoeth.github.io/validator/audit.html)** — 6-panel real-time monitoring surface polling the live API every 60 seconds. Shows decision status, regime proximity gradient, ledger accumulation progress (7-day milestone), system health, regime timeline, and consumer activity. Single-file HTML, zero dependencies. See [`docs/AUDIT_DASHBOARD.md`](docs/AUDIT_DASHBOARD.md) for full documentation.
