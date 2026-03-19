@@ -247,6 +247,7 @@ def regime_current():
         "regimeSurvival": _regime_survival_neutral(),
         "ensembleConfidence": _ensemble_confidence_neutral(),
         "regimeChangeAlert": _regime_alert_neutral(),
+        "predictionCalibration": _prediction_calibration_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -1184,6 +1185,7 @@ def signals_filtered():
         "regimeSurvival": _regime_survival_neutral(),
         "ensembleConfidence": _ensemble_confidence_neutral(),
         "regimeChangeAlert": _regime_alert_neutral(),
+        "predictionCalibration": _prediction_calibration_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
@@ -1479,6 +1481,43 @@ def _regime_alert_systemic():
             "ensembleConfidence": "AVAILABLE",
         },
     }
+
+
+def _prediction_calibration_neutral():
+    """Prediction calibration at NEUTRAL — calibration reflects historical accuracy."""
+    return {
+        "status": "AT_NEUTRAL",
+        "modelVersion": "prediction-calibration-v1",
+        "message": "Prediction calibration computed against 5 historical transitions. Currently at NEUTRAL.",
+        "methodology": "Brier score decomposition (reliability-resolution) with 3-bin calibration.",
+        "perModuleScoring": {
+            "regimeSurvival": {"brierScore": 0.242, "decomposition": {"reliability": 0.021, "resolution": 0.033, "uncertainty": 0.25, "decompositionCheck": True, "decompositionGap": 0.004}, "pairCount": 26, "skillScore": 0.032, "rank": 4, "calibrationTable": [{"bin": "[0.00, 0.33)", "count": 13, "avgPredicted": 0.12, "observedFrequency": 0.077, "gap": 0.043}], "calibrationSlope": 1.2, "calibrationInterpretation": "WELL_CALIBRATED", "sharpness": 0.22, "lotoCI95": {"lower": 0.18, "upper": 0.30, "se": 0.022}},
+            "regimeChangeAlert": {"brierScore": 0.068, "decomposition": {"reliability": 0.064, "resolution": 0.25, "uncertainty": 0.25, "decompositionCheck": True, "decompositionGap": 0.004}, "pairCount": 26, "skillScore": 0.73, "rank": 1, "calibrationTable": [{"bin": "[0.00, 0.33)", "count": 13, "avgPredicted": 0.096, "observedFrequency": 0.0, "gap": 0.096}], "calibrationSlope": 1.50, "calibrationInterpretation": "UNDERCONFIDENT", "sharpness": 0.30, "lotoCI95": {"lower": 0.05, "upper": 0.09, "se": 0.007}},
+        },
+        "aggregateCalibrationTable": [{"bin": "[0.00, 0.33)", "count": 60, "avgPredicted": 0.153, "observedFrequency": 0.217, "gap": 0.064}],
+        "aggregateCalibrationSlope": 0.50,
+        "aggregateSharpness": 0.26,
+        "naiveBaselines": {
+            "uniformCDF": {"brierScore": 0.147, "sharpness": 0.18, "description": "Uniform CDF: p(d) = d/14."},
+            "coinFlip": {"brierScore": 0.25, "sharpness": 0.0, "description": "Coin flip: p(d) = 0.5 always."},
+            "alwaysPredictMedian": {"brierScore": 0.269, "sharpness": 0.50, "description": "Step function at median."},
+        },
+        "accuracyRanking": [{"rank": 1, "module": "regimeChangeAlert", "skillScore": 0.73, "brierScore": 0.068, "grade": "A"}],
+        "compositeCalibration": {"score": 0.26, "grade": "D", "components": {"avgSkillScore": {"value": -0.04, "weight": 0.40}, "avgReliability": {"value": 0.15, "weight": 0.30}, "avgSharpness": {"value": 0.27, "weight": 0.30}}, "interpretation": "Pipeline composite calibration grade D."},
+        "leaveOneTransitionOut": {"perModule": {}, "aggregateStability": "STABLE", "nextTransitionImpact": {"expectedCIReduction": "8.7%", "description": "Adding one more transition reduces CIs by ~8.7%."}},
+        "perTransitionDiagnostic": [{"regime": "DIVERGENCE", "duration": 5, "bestModule": {"name": "regimeChangeAlert", "brierScore": 0.05}, "worstModule": {"name": "hitRateDecay", "brierScore": 0.41}, "avgBrier": 0.20, "note": "Medium regime."}],
+        "groundTruth": {"completedTransitions": 5, "totalPairsGenerated": 166, "sampleDays": [1, 2, 3, 5, 7, 10, 13, 14], "transitionList": []},
+        "limitations": ["TINY_SAMPLE: n=5 completed transitions.", "SIMULATED_PREDICTIONS: Predictions simulated retrospectively."],
+        "upstreamDependencies": {},
+    }
+
+
+def _prediction_calibration_systemic():
+    """Prediction calibration during SYSTEMIC — active calibration scoring."""
+    data = _prediction_calibration_neutral()
+    data["status"] = "ACTIVE"
+    data["message"] = "Prediction calibration active. 5 completed transitions, 166 total pairs. Composite grade: D."
+    return data
 
 
 # ── Route map ──────────────────────────────────────────────────────────────────
