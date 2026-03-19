@@ -242,6 +242,7 @@ def regime_current():
         "transitionForecast": _transition_forecast_neutral(),
         "hitRateDecayModel": _hit_rate_decay_neutral(),
         "capitalPreservation": _capital_preservation_neutral(),
+        "optimalReEntry": _optimal_reentry_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -473,6 +474,201 @@ def _hit_rate_decay_systemic():
     }
 
 
+def _optimal_reentry_neutral():
+    """Optimal re-entry timing under NEUTRAL — entry available now."""
+    return {
+        "status": "AT_NEUTRAL",
+        "modelVersion": "optimal-reentry-v1",
+        "message": "Regime is NEUTRAL — signals are already actionable. No re-entry timing needed.",
+        "riskFreeRate14d": 0.150,
+        "riskFreeRateDescription": "USDC yield at 4% APY over 14-day horizon",
+        "optimalEntryDay": 0,
+        "crossoverDay": None,
+        "crossoverDate": None,
+        "crossoverMessage": "Already at NEUTRAL — entry available now.",
+        "firstTypeToCross": None,
+        "entryThreshold": None,
+        "perType": None,
+        "aggregateCurve": None,
+        "sensitivityBands": None,
+        "upstreamDependencies": None,
+        "limitations": None,
+    }
+
+
+def _optimal_reentry_systemic():
+    """Optimal re-entry timing under SYSTEMIC — full prescriptive output."""
+    return {
+        "status": "CONDITIONAL",
+        "modelVersion": "optimal-reentry-v1",
+        "message": "Re-entry timing model active (CONDITIONAL — all velocities negative, using historical transition rates). Regime day 13.",
+        "methodology": "E[R|d] = P(NEUTRAL|d) * E[R|NEUTRAL] + P(SYSTEMIC|d) * [h_adj(d) * R_win + (1-h_adj(d)) * R_loss]. P(NEUTRAL|d) from uniform CDF over transition bounds. h_adj(d) from exponential decay. R_win/R_loss from cross-regime decomposition. Crossover = first day where E[R] > risk-free rate (0.15% per 14d).",
+        "regimeDurationDays": 13,
+        "riskFreeRate14d": 0.150,
+        "riskFreeRateDescription": "USDC yield at 4% APY over 14-day horizon",
+        "transitionBounds": {
+            "optimisticDays": 5,
+            "baseDays": 7,
+            "pessimisticDays": 15,
+            "isConditional": True,
+            "survivalModel": "Uniform CDF: P(NEUTRAL|d) = 0 for d <= optimistic, linear ramp to 1.0 at pessimistic",
+        },
+        "optimalEntryDay": None,
+        "crossoverDay": None,
+        "crossoverDate": None,
+        "crossoverMessage": "No crossover in 30-day forecast window. All signal types currently deteriorating — transition bounds are conditional on recovery beginning. Monitor for velocity reversal.",
+        "firstTypeToCross": {
+            "type": "CRYPTO_LEADS",
+            "label": "Crypto Leads",
+            "crossoverDay": 12,
+            "crossoverDate": "2026-03-31",
+            "reason": "CRYPTO_LEADS has the fastest confidence recovery on regime flip due to its decay dynamics (half-life 4.17d).",
+        },
+        "entryThreshold": {
+            "minimumProximityScore": 0.15,
+            "currentProximityScore": 0.012,
+            "currentProximityLabel": "ENTRENCHED",
+            "recommendation": "Proximity below threshold — re-entry not imminent. Check back when proximity reaches 0.15.",
+        },
+        "perType": {
+            "CRYPTO_LEADS": {
+                "label": "Crypto Leads",
+                "neutralExpectedReturn": 8.24,
+                "currentExpectedReturn": -13.073,
+                "decomposition": {"winReturn": 13.48, "lossReturn": -15.62},
+                "halfLifeDays": 4.17,
+                "crossoverDay": 12,
+                "crossoverDate": "2026-03-31",
+                "crossoverMessage": "EV crosses risk-free on forward day 12 (regime day 25)",
+                "sampleCurve": [
+                    {"day": 0, "regimeDay": 13, "pNeutral": 0.0, "adjustedHitRate": 0.0917, "expectedReturn": -13.073, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 5, "regimeDay": 18, "pNeutral": 0.0, "adjustedHitRate": 0.0267, "expectedReturn": -14.844, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 7, "regimeDay": 20, "pNeutral": 0.2, "adjustedHitRate": 0.1752, "expectedReturn": -10.462, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 10, "regimeDay": 23, "pNeutral": 0.5, "adjustedHitRate": 0.4127, "expectedReturn": -3.258, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 14, "regimeDay": 27, "pNeutral": 0.9, "adjustedHitRate": 0.7390, "expectedReturn": 6.503, "kellyFraction": 0.2214, "exceedsRiskFree": True},
+                    {"day": 21, "regimeDay": 34, "pNeutral": 1.0, "adjustedHitRate": 0.82, "expectedReturn": 8.24, "kellyFraction": 0.2108, "exceedsRiskFree": True},
+                ],
+            },
+            "SEMI_LEADS": {
+                "label": "Semi Leads",
+                "neutralExpectedReturn": -14.60,
+                "currentExpectedReturn": -14.60,
+                "decomposition": {"winReturn": -14.60, "lossReturn": -14.60},
+                "halfLifeDays": 32.28,
+                "crossoverDay": None,
+                "crossoverDate": None,
+                "crossoverMessage": "No crossover in 30-day window — negative EV even in NEUTRAL (not a tradeable signal type)",
+                "sampleCurve": [
+                    {"day": 0, "regimeDay": 13, "pNeutral": 0.0, "adjustedHitRate": 0.0928, "expectedReturn": -14.60, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 14, "regimeDay": 27, "pNeutral": 0.9, "adjustedHitRate": 0.1148, "expectedReturn": -14.60, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 30, "regimeDay": 43, "pNeutral": 1.0, "adjustedHitRate": 0.12, "expectedReturn": -14.60, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                ],
+            },
+            "FULL_DECOUPLE": {
+                "label": "Full Decouple",
+                "neutralExpectedReturn": -6.55,
+                "currentExpectedReturn": -8.842,
+                "decomposition": {"winReturn": -3.05, "lossReturn": -10.05},
+                "halfLifeDays": 8.50,
+                "crossoverDay": None,
+                "crossoverDate": None,
+                "crossoverMessage": "No crossover in 30-day window — negative EV even in NEUTRAL (not a tradeable signal type)",
+                "sampleCurve": [
+                    {"day": 0, "regimeDay": 13, "pNeutral": 0.0, "adjustedHitRate": 0.1708, "expectedReturn": -8.842, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 14, "regimeDay": 27, "pNeutral": 0.9, "adjustedHitRate": 0.4547, "expectedReturn": -6.806, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                    {"day": 30, "regimeDay": 43, "pNeutral": 1.0, "adjustedHitRate": 0.50, "expectedReturn": -6.55, "kellyFraction": 0.0, "exceedsRiskFree": False},
+                ],
+            },
+        },
+        "aggregateCurve": [
+            {"day": 0, "regimeDay": 13, "pNeutral": 0.0, "weightedExpectedReturn": -11.758, "weightedKellyFraction": 0.0, "weightedHitRate": 0.0775, "exceedsRiskFree": False},
+            {"day": 7, "regimeDay": 20, "pNeutral": 0.2, "weightedExpectedReturn": -10.186, "weightedKellyFraction": 0.0, "weightedHitRate": 0.1088, "exceedsRiskFree": False},
+            {"day": 14, "regimeDay": 27, "pNeutral": 0.9, "weightedExpectedReturn": -5.012, "weightedKellyFraction": 0.065, "weightedHitRate": 0.3692, "exceedsRiskFree": False},
+            {"day": 21, "regimeDay": 34, "pNeutral": 1.0, "weightedExpectedReturn": -4.826, "weightedKellyFraction": 0.062, "weightedHitRate": 0.3923, "exceedsRiskFree": False},
+            {"day": 30, "regimeDay": 43, "pNeutral": 1.0, "weightedExpectedReturn": -4.685, "weightedKellyFraction": 0.059, "weightedHitRate": 0.4012, "exceedsRiskFree": False},
+        ],
+        "sensitivityBands": {
+            "optimistic": {
+                "scenario": "Faster transition (-30%) + slower decay (+30% half-life) — earliest plausible re-entry",
+                "transitionBounds": {"optimistic": 4, "pessimistic": 11},
+                "aggregateCrossoverDay": None,
+                "aggregateCrossoverDate": None,
+                "perType": {
+                    "CRYPTO_LEADS": {"crossoverDay": 9, "crossoverDate": "2026-03-28", "halfLifeDays": 5.42},
+                    "SEMI_LEADS": {"crossoverDay": None, "crossoverDate": None, "halfLifeDays": 41.96},
+                    "FULL_DECOUPLE": {"crossoverDay": None, "crossoverDate": None, "halfLifeDays": 11.05},
+                },
+            },
+            "base": {
+                "scenario": "Calibrated estimate — median historical rates",
+                "transitionBounds": {"optimistic": 5, "pessimistic": 15},
+                "aggregateCrossoverDay": None,
+                "aggregateCrossoverDate": None,
+                "perType": {
+                    "CRYPTO_LEADS": {"crossoverDay": 12, "crossoverDate": "2026-03-31", "halfLifeDays": 4.17},
+                    "SEMI_LEADS": {"crossoverDay": None, "crossoverDate": None, "halfLifeDays": 32.28},
+                    "FULL_DECOUPLE": {"crossoverDay": None, "crossoverDate": None, "halfLifeDays": 8.50},
+                },
+            },
+            "pessimistic": {
+                "scenario": "Slower transition (+50%) + faster decay (-30% half-life) — latest plausible re-entry",
+                "transitionBounds": {"optimistic": 8, "pessimistic": 23},
+                "aggregateCrossoverDay": None,
+                "aggregateCrossoverDate": None,
+                "perType": {
+                    "CRYPTO_LEADS": {"crossoverDay": 17, "crossoverDate": "2026-04-05", "halfLifeDays": 2.92},
+                    "SEMI_LEADS": {"crossoverDay": None, "crossoverDate": None, "halfLifeDays": 22.60},
+                    "FULL_DECOUPLE": {"crossoverDay": None, "crossoverDate": None, "halfLifeDays": 5.95},
+                },
+            },
+        },
+        "upstreamDependencies": {
+            "hitRateDecayModel": {
+                "status": "ACTIVE",
+                "available": True,
+                "regimeDurationDays": 13,
+                "biasDirection": "If half-life OVERSTATED (actual decay faster), re-entry estimate is TOO EARLY by ~1-2 days. If UNDERSTATED, estimate is too late.",
+                "impact": "Controls h_adj(d) — the adjusted hit rate at each future day",
+            },
+            "transitionForecast": {
+                "status": "NO_RECOVERY_SIGNAL",
+                "available": True,
+                "isConditional": True,
+                "estimatedDays": {"optimistic": 5, "base": 7, "pessimistic": 15},
+                "biasDirection": "CONDITIONAL — historical rates only. If current period exceeds historical median, estimate is TOO OPTIMISTIC.",
+                "impact": "Determines P(NEUTRAL|d) via uniform CDF between transition bounds",
+            },
+            "regimeProximity": {
+                "status": "ENTRENCHED",
+                "available": True,
+                "score": 0.012,
+                "biasDirection": "Advisory only — does not affect EV calculation. Informs entryThreshold.",
+                "impact": "Used for entryThreshold recommendation",
+            },
+            "capitalPreservationDecomposition": {
+                "status": "DERIVED",
+                "available": True,
+                "biasDirection": "Assumes regime-invariant win/loss magnitudes. If SYSTEMIC losses are fatter-tailed, model UNDERSTATES cost of early entry.",
+                "impact": "Provides R_win and R_loss per type via cross-regime 2-equation system",
+            },
+        },
+        "limitations": {
+            "summary": "Synthesizes 4 upstream modules — errors compound across the dependency chain. Net bias direction: PREMATURE.",
+            "netBiasDirection": "PREMATURE",
+            "netBiasExplanation": "Decay overstatement -> earlier re-entry. Velocity extrapolation -> optimistic transition -> earlier re-entry. Regime-invariant returns -> understated SYSTEMIC losses -> earlier re-entry. 3 of 4 upstream biases push re-entry earlier. Treat the crossover date as a LOWER BOUND (earliest plausible), not a point estimate.",
+            "cascadeRisk": "A 20% decay overstatement + 15% kelly oversize + 10% transition timing error = ~35-45% combined overstatement of entry attractiveness. Sensitivity bands attempt to bound this.",
+            "specificLimitations": [
+                "P(NEUTRAL|d) modeled as uniform CDF between optimistic (5d) and pessimistic (15d) transition bounds. With n=2 historical SYSTEMIC periods, the distribution shape is unconstrained.",
+                "Kelly fraction assumes independent bets but regime-conditioned returns have serial correlation (14d horizon with overlapping windows).",
+                "Cross-regime decomposition assumes regime-invariant win/loss return magnitudes. SYSTEMIC losses may exhibit fatter tails.",
+                "Velocity measured over ~5-day window. Sudden market reversal would not update P(NEUTRAL) until the next 15-minute refresh cycle.",
+                "Model optimizes for a single 14-day horizon. Shorter/longer horizons shift the crossover date.",
+                "CONDITIONAL FORECAST: All velocities currently negative. Transition bounds use historical recovery rates, not live velocity.",
+            ],
+        },
+    }
+
+
 def _capital_preservation_neutral():
     return {
         "status": "AT_NEUTRAL",
@@ -574,6 +770,7 @@ def signals_filtered():
         "transitionForecast": _transition_forecast_neutral(),
         "hitRateDecayModel": _hit_rate_decay_neutral(),
         "capitalPreservation": _capital_preservation_neutral(),
+        "optimalReEntry": _optimal_reentry_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
