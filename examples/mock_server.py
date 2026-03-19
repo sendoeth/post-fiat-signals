@@ -246,6 +246,7 @@ def regime_current():
         "parameterUncertainty": _parameter_uncertainty_neutral(),
         "regimeSurvival": _regime_survival_neutral(),
         "ensembleConfidence": _ensemble_confidence_neutral(),
+        "regimeChangeAlert": _regime_alert_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -1182,6 +1183,7 @@ def signals_filtered():
         "parameterUncertainty": _parameter_uncertainty_neutral(),
         "regimeSurvival": _regime_survival_neutral(),
         "ensembleConfidence": _ensemble_confidence_neutral(),
+        "regimeChangeAlert": _regime_alert_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
@@ -1370,6 +1372,112 @@ def health():
         "dataFresh": True,
         "lastError": None,
         "schemaVersion": "v1.1.0",
+    }
+
+
+def _regime_alert_neutral():
+    """Regime change alert for NEUTRAL regime — inactive."""
+    return {
+        "status": "AT_NEUTRAL",
+        "modelVersion": "regime-alert-v1",
+        "severity": "NONE",
+        "severityConfidence": 0,
+        "message": "Regime is NEUTRAL — signals are live and actionable. No regime change alert needed.",
+        "methodology": "Regime change alerts only activate during non-NEUTRAL regimes.",
+        "adaptiveThresholds": None,
+        "hysteresis": None,
+        "diagnosticPayload": None,
+        "cooldown": {"active": False, "reason": "Regime is NEUTRAL", "daysRemaining": 0, "cooldownWindowDays": 5},
+        "transitionMomentum": None,
+        "backtestSummary": None,
+        "limitations": ["AT_NEUTRAL: Alert system inactive during NEUTRAL regime."],
+        "upstreamDependencies": {},
+    }
+
+def _regime_alert_systemic():
+    """Regime change alert during SYSTEMIC — WATCH severity with 2/8 signals active."""
+    return {
+        "status": "ACTIVE",
+        "modelVersion": "regime-alert-v1",
+        "severity": "WATCH",
+        "severityConfidence": 0.22,
+        "message": "WATCH — 2/8 transition signals active. Monitoring for escalation.",
+        "methodology": "Synthesizes 8 boolean signal tests across 9 upstream modules via N-of-M agreement.",
+        "adaptiveThresholds": {
+            "proximityThreshold": 0.25,
+            "exitProbabilityThreshold": 0.42,
+            "ensembleConfidenceEffect": "NEUTRAL",
+            "durationEffect": "TIGHTEN",
+            "adjustmentReason": "Regime past Weibull median (13d > 11.3d) — partially tightened.",
+        },
+        "hysteresis": {
+            "activeSignalCount": 2,
+            "requiredForWatch": 2,
+            "requiredForWarning": 4,
+            "requiredForCritical": 6,
+            "signals": [
+                {"name": "proximity_score", "module": "regimeProximity", "active": False, "value": 0.012, "threshold": 0.25, "contribution": 0},
+                {"name": "proximity_label", "module": "regimeProximity", "active": False, "value": "ENTRENCHED", "threshold": "RECOVERING or NEAR_TRANSITION", "contribution": 0},
+                {"name": "exit_probability", "module": "regimeSurvival", "active": True, "value": 0.635, "threshold": 0.42, "contribution": 0.371},
+                {"name": "forecast_imminent", "module": "transitionForecast", "active": True, "value": 7, "threshold": 7, "contribution": 0},
+                {"name": "crossover_possible", "module": "parameterUncertainty", "active": False, "value": 1.0, "threshold": 0.5, "contribution": 0},
+                {"name": "reentry_defined", "module": "optimalReEntry", "active": False, "value": None, "threshold": "not null", "contribution": 0},
+                {"name": "ensemble_disagreement", "module": "ensembleConfidence", "active": False, "value": 0.45, "threshold": 0.5, "contribution": 0},
+                {"name": "bottleneck_recovering", "module": "regimeProximity", "active": False, "value": -0.45, "threshold": 0, "contribution": 0},
+            ],
+        },
+        "diagnosticPayload": {
+            "primaryTriggers": [
+                {"module": "regimeSurvival", "signal": "exit_probability", "value": 0.635, "threshold": 0.42, "interpretation": "exit_probability active — Weibull P(exit by day 13) exceeds adaptive threshold."},
+                {"module": "transitionForecast", "signal": "forecast_imminent", "value": 7, "threshold": 7, "interpretation": "forecast_imminent active — estimated transition within 7 days."},
+            ],
+            "supportingSignals": [],
+            "contradictingSignals": [
+                {"module": "regimeProximity", "signal": "proximity_score", "value": 0.012, "threshold": 0.25, "interpretation": "Deeply ENTRENCHED — argues against imminent transition."},
+            ],
+            "escalationBlockers": ["Need >= 4 signals or RECOVERING label for WARNING (currently 2/8)."],
+            "regimeDurationDays": 13,
+            "weibullMedianDays": 11.34,
+        },
+        "cooldown": {"active": False, "reason": "No cooldown — normal alerting active.", "daysRemaining": 0, "cooldownWindowDays": 5},
+        "transitionMomentum": {
+            "score": 0.0,
+            "label": "STABLE",
+            "primaryDriver": {"signal": "proximity_score", "contribution": -0.20},
+            "interpretation": "Regime signals are balanced — no clear directional momentum.",
+        },
+        "backtestSummary": {
+            "transitionsAnalyzed": 5,
+            "detectionResults": [
+                {"regime": "DIVERGENCE", "entryDate": "2025-10-24", "exitDate": "2025-10-29", "durationDays": 5, "detected": True, "detectionLatencyDays": 1},
+                {"regime": "SYSTEMIC", "entryDate": "2025-11-06", "exitDate": "2025-11-19", "durationDays": 13, "detected": True, "detectionLatencyDays": 5},
+                {"regime": "SYSTEMIC", "entryDate": "2025-11-24", "exitDate": "2025-11-28", "durationDays": 4, "detected": True, "detectionLatencyDays": 1},
+                {"regime": "EARNINGS", "entryDate": "2026-01-13", "exitDate": "2026-01-27", "durationDays": 14, "detected": True, "detectionLatencyDays": 5},
+                {"regime": "EARNINGS", "entryDate": "2026-01-30", "exitDate": "2026-02-04", "durationDays": 5, "detected": True, "detectionLatencyDays": 1},
+            ],
+            "aggregateMetrics": {
+                "avgDetectionLatencyDays": 2.6,
+                "medianDetectionLatencyDays": 1,
+                "falsePositiveCount": 0,
+                "truePositiveRate": 1.0,
+                "earliestDetectionDays": 5,
+            },
+        },
+        "limitations": [
+            "STATELESS_HYSTERESIS: No cross-request state. Severity from snapshot, not temporal persistence.",
+            "SIMULATED_BACKTEST: Uses Weibull CDF + linear recovery proxy, not actual module outputs.",
+            "SMALL_SAMPLE_BACKTEST: n=5 transitions. Metrics are directional only.",
+        ],
+        "upstreamDependencies": {
+            "regimeProximity": "AVAILABLE",
+            "transitionForecast": "AVAILABLE",
+            "hitRateDecay": "AVAILABLE",
+            "capitalPreservation": "AVAILABLE",
+            "optimalReEntry": "AVAILABLE",
+            "parameterUncertainty": "AVAILABLE",
+            "regimeSurvival": "AVAILABLE",
+            "ensembleConfidence": "AVAILABLE",
+        },
     }
 
 

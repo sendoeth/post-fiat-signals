@@ -51,6 +51,10 @@ Key fields:
 
 See [`docs/ENSEMBLE_CONFIDENCE.md`](docs/ENSEMBLE_CONFIDENCE.md) for full field reference.
 
+## Regime Change Alert
+
+`GET /signals/filtered` and `GET /regime/current` include a `regimeChangeAlert` object that converts passive polling into actionable state-change alerts. Synthesizes all 9 upstream modules into a single severity level (NONE/WATCH/WARNING/CRITICAL/CONFIRMED) via 8 boolean signal tests with adaptive thresholds, stateless hysteresis, cooldown mechanics, and backtest validation against 5 completed regime transitions. Adaptive thresholds tighten when ensemble confidence is high or regime duration exceeds the Weibull median. Includes transition momentum score (regime hardening vs dissolving), diagnostic payload with primary triggers and escalation blockers, and a backtest summary with detection latency and true positive rate. See [`docs/REGIME_CHANGE_ALERT.md`](docs/REGIME_CHANGE_ALERT.md) for full field reference and consumer code examples.
+
 ## Forward-Test Audit Dashboard
 
 **[Live Dashboard](https://sendoeth.github.io/validator/audit.html)** — 6-panel real-time monitoring surface polling the live API every 60 seconds. Shows decision status, regime proximity gradient, ledger accumulation progress (7-day milestone), system health, regime timeline, and consumer activity. Single-file HTML, zero dependencies. See [`docs/AUDIT_DASHBOARD.md`](docs/AUDIT_DASHBOARD.md) for full documentation.
