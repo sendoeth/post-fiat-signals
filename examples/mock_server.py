@@ -245,6 +245,7 @@ def regime_current():
         "optimalReEntry": _optimal_reentry_neutral(),
         "parameterUncertainty": _parameter_uncertainty_neutral(),
         "regimeSurvival": _regime_survival_neutral(),
+        "ensembleConfidence": _ensemble_confidence_neutral(),
         "timestamp": _ts(),
         "dataAgeSec": 120,
         "isStale": False,
@@ -980,6 +981,195 @@ def _regime_survival_systemic():
     }
 
 
+def _ensemble_confidence_neutral():
+    """Ensemble confidence at NEUTRAL — calibrator not applicable."""
+    return {
+        "status": "AT_NEUTRAL",
+        "modelVersion": "ensemble-confidence-v1",
+        "message": "Regime is NEUTRAL — ensemble calibrator not applicable.",
+    }
+
+
+def _ensemble_confidence_systemic():
+    """Ensemble confidence during SYSTEMIC — full cross-module calibration output."""
+    return {
+        "status": "ACTIVE",
+        "modelVersion": "ensemble-confidence-v1",
+        "message": "Ensemble confidence calibrator active. Regime day 13. Composite reliability: 0.57 (MODERATE). Net bias: OPTIMISTIC — 5 of 8 modules overstate exit/entry attractiveness.",
+        "methodology": "Cross-module vote aggregation with pairwise tension detection. Calibration comparison uses LOO holdout on historical transitions. Composite score = weighted harmonic mean of per-module reliability grades.",
+        "regimeDurationDays": 13,
+        "crossModuleAgreement": {
+            "persistenceVote": {
+                "question": "Will SYSTEMIC persist beyond day 14?",
+                "voteSummary": {"YES": 5, "NO": 2, "ABSTAIN": 1},
+                "perModuleVotes": [
+                    {"module": "regimeProximity", "vote": "YES", "confidence": 0.92, "reason": "Score 0.012 — deeply ENTRENCHED, no recovery signal."},
+                    {"module": "transitionForecast", "vote": "YES", "confidence": 0.78, "reason": "All 3 types deteriorating. NO_RECOVERY_SIGNAL status."},
+                    {"module": "hitRateDecay", "vote": "YES", "confidence": 0.85, "reason": "All types decayed below aggregate. CRYPTO_LEADS at noise floor."},
+                    {"module": "capitalPreservation", "vote": "YES", "confidence": 0.88, "reason": "Counterfactual loss 11.27%/entry — regime still extracting value from signal suppression."},
+                    {"module": "optimalReEntry", "vote": "YES", "confidence": 0.71, "reason": "No aggregate crossover in 30-day window."},
+                    {"module": "parameterUncertainty", "vote": "ABSTAIN", "confidence": 0.40, "reason": "Transition duration CI [1, 65.7] days too wide for directional vote."},
+                    {"module": "regimeSurvival", "vote": "NO", "confidence": 0.59, "reason": "Weibull P(exit by day 13) = 0.587 — slightly favors exit, but CI includes memoryless."},
+                    {"module": "ensembleConfidence", "vote": "NO", "confidence": 0.52, "reason": "Historical base rate: 50% of SYSTEMIC periods ended by day 13."},
+                ],
+            },
+            "tradeVote": {
+                "question": "Should a consumer place trades based on current signals?",
+                "voteSummary": {"NO": 5, "YES": 1, "CONDITIONAL": 1},
+                "perModuleVotes": [
+                    {"module": "regimeProximity", "vote": "NO", "confidence": 0.95, "reason": "ENTRENCHED — proximity 0.012 far below 0.15 entry threshold."},
+                    {"module": "hitRateDecay", "vote": "NO", "confidence": 0.90, "reason": "All adjusted hit rates below aggregate. CRYPTO_LEADS at 11.2%."},
+                    {"module": "capitalPreservation", "vote": "NO", "confidence": 0.88, "reason": "Expected loss 11.27% per entry."},
+                    {"module": "optimalReEntry", "vote": "NO", "confidence": 0.82, "reason": "No crossover — EV negative across entire 30-day window."},
+                    {"module": "parameterUncertainty", "vote": "NO", "confidence": 0.75, "reason": "0/7 scenarios achieve aggregate crossover."},
+                    {"module": "regimeSurvival", "vote": "CONDITIONAL", "confidence": 0.55, "reason": "P(exit) = 0.587 — near coin flip. If regime exits, CRYPTO_LEADS immediately actionable."},
+                    {"module": "transitionForecast", "vote": "YES", "confidence": 0.35, "reason": "Current duration (13d) exceeds historical median (8.5d) — reversion probability elevated."},
+                ],
+            },
+        },
+        "calibrationComparison": {
+            "description": "Per-module accuracy on historical regime transitions (LOO where applicable).",
+            "entries": [
+                {
+                    "module": "regimeProximity",
+                    "metric": "Proximity score at T-1 before transition",
+                    "historicalAccuracy": 0.75,
+                    "sampleSize": 4,
+                    "bias": "CONSERVATIVE",
+                    "note": "Proximity lagged actual transition by 1-2 days in 3/4 cases.",
+                },
+                {
+                    "module": "transitionForecast",
+                    "metric": "MAE of predicted vs actual exit day",
+                    "historicalAccuracy": 0.55,
+                    "sampleSize": 2,
+                    "bias": "OPTIMISTIC",
+                    "note": "MAE 4.5 days on n=2 SYSTEMIC periods. Median-based forecast overshoots fast recoveries.",
+                },
+                {
+                    "module": "regimeSurvival",
+                    "metric": "Brier score improvement over uniform CDF",
+                    "historicalAccuracy": 0.62,
+                    "sampleSize": 5,
+                    "bias": "OPTIMISTIC",
+                    "note": "Weibull 9.1% better than uniform on Brier score. Overstates P(exit) due to right-censoring.",
+                },
+                {
+                    "module": "hitRateDecay",
+                    "metric": "Predicted vs observed per-period hit rate",
+                    "historicalAccuracy": 0.68,
+                    "sampleSize": 2,
+                    "bias": "CONSERVATIVE",
+                    "note": "Exponential decay slightly underestimates early-period signal retention.",
+                },
+            ],
+        },
+        "disagreementDiagnostic": {
+            "overallTension": "MODERATE",
+            "tensionScore": 0.42,
+            "tensionScale": "0.0 = full agreement, 1.0 = maximum disagreement",
+            "pairwiseTensions": [
+                {
+                    "moduleA": "regimeSurvival",
+                    "moduleB": "regimeProximity",
+                    "tension": 0.68,
+                    "description": "Survival model says P(exit)=0.587 (slightly favors exit), but proximity says ENTRENCHED (score 0.012). Survival uses parametric duration model; proximity uses velocity-based recovery score.",
+                    "resolution": "Proximity is more conservative — it requires observable velocity reversal. Survival extrapolates from distributional shape.",
+                },
+                {
+                    "moduleA": "transitionForecast",
+                    "moduleB": "optimalReEntry",
+                    "tension": 0.31,
+                    "description": "Forecast says NO_RECOVERY_SIGNAL but re-entry model projects CRYPTO_LEADS crossover at day 12 (conditional). Both use historical rates differently.",
+                    "resolution": "Re-entry crossover is CONDITIONAL on recovery beginning. Not inconsistent — different assumptions about recovery onset.",
+                },
+                {
+                    "moduleA": "parameterUncertainty",
+                    "moduleB": "hitRateDecay",
+                    "tension": 0.22,
+                    "description": "Uncertainty module reports CRYPTO_LEADS systemic hit rate CI [0.036, 0.625], while decay model uses point estimate 0.20. Wide CI suggests point estimate may be unreliable.",
+                    "resolution": "Decay model is deliberately point-estimate based. Uncertainty module provides the CI wrapper.",
+                },
+            ],
+        },
+        "compositeReliability": {
+            "score": 0.57,
+            "grade": "MODERATE",
+            "scale": "0.0 = no reliability, 1.0 = maximum reliability",
+            "gradeThresholds": {"LOW": [0, 0.35], "MODERATE": [0.35, 0.65], "HIGH": [0.65, 0.85], "VERY_HIGH": [0.85, 1.0]},
+            "drivers": [
+                {"factor": "Sample size (n=2 SYSTEMIC)", "impact": -0.18, "direction": "NEGATIVE"},
+                {"factor": "Module agreement (5/8 persistence YES)", "impact": 0.12, "direction": "POSITIVE"},
+                {"factor": "Transition duration CI width (64.7d)", "impact": -0.15, "direction": "NEGATIVE"},
+                {"factor": "Weibull vs uniform Brier improvement (9.1%)", "impact": 0.05, "direction": "POSITIVE"},
+                {"factor": "Cross-module vote consistency (trade: 5/7 NO)", "impact": 0.08, "direction": "POSITIVE"},
+            ],
+            "interpretation": "Moderate reliability — modules broadly agree on NO_TRADE but persistence timing is uncertain. Small sample dominates uncertainty.",
+        },
+        "informationContributions": [
+            {"module": "transitionForecast", "contribution": 0.267, "label": "Transition timing", "reason": "Dominant uncertainty source (n=2, 56.7% of crossover range). Drives both persistence and re-entry estimates."},
+            {"module": "hitRateDecay", "contribution": 0.221, "label": "Hit rate estimation", "reason": "Controls adjusted confidence for all signal types. CRYPTO_LEADS at noise floor amplifies impact."},
+            {"module": "regimeSurvival", "contribution": 0.178, "label": "Duration modeling", "reason": "Weibull provides non-uniform exit probability. Only module suggesting exit is plausible."},
+            {"module": "capitalPreservation", "contribution": 0.134, "label": "Loss quantification", "reason": "Provides counterfactual magnitude. 11.27%/entry grounds the cost of premature re-entry."},
+            {"module": "parameterUncertainty", "contribution": 0.089, "label": "Uncertainty bounds", "reason": "Wraps all upstream point estimates with CIs. Reveals 0/7 scenarios cross aggregate threshold."},
+            {"module": "regimeProximity", "contribution": 0.067, "label": "Recovery tracking", "reason": "Real-time velocity monitoring. First module to detect recovery onset."},
+            {"module": "optimalReEntry", "contribution": 0.044, "label": "Entry synthesis", "reason": "Downstream consumer — synthesizes but adds limited new information beyond upstream modules."},
+        ],
+        "scenarioStressTest": {
+            "description": "How ensemble confidence changes under alternative parameter assumptions.",
+            "scenarios": {
+                "base": {
+                    "label": "Current MLE estimates",
+                    "compositeScore": 0.57,
+                    "grade": "MODERATE",
+                    "persistenceVoteMajority": "YES",
+                    "tradeVoteMajority": "NO",
+                },
+                "optimistic": {
+                    "label": "Faster recovery (+1 SD on velocity, halved transition CI)",
+                    "compositeScore": 0.41,
+                    "grade": "MODERATE",
+                    "persistenceVoteMajority": "SPLIT",
+                    "tradeVoteMajority": "CONDITIONAL",
+                    "changedVotes": ["regimeSurvival -> YES (exit)", "transitionForecast -> YES (recovery visible)"],
+                },
+                "pessimistic": {
+                    "label": "Extended SYSTEMIC (+50% duration, wider decay CIs)",
+                    "compositeScore": 0.72,
+                    "grade": "HIGH",
+                    "persistenceVoteMajority": "YES",
+                    "tradeVoteMajority": "NO",
+                    "changedVotes": ["regimeSurvival -> YES (persist)", "parameterUncertainty -> YES (persist)"],
+                },
+            },
+        },
+        "netBiasAssessment": {
+            "direction": "OPTIMISTIC",
+            "magnitude": 0.15,
+            "magnitudeScale": "0.0 = unbiased, 1.0 = maximally biased",
+            "explanation": "5 of 8 module biases push toward earlier exit / more attractive re-entry: right-censoring inflates P(exit), median-based forecast overshoots fast recovery, small-sample hit rates have upward Wilson bias, uniform CDF saturates at 1.0, velocity extrapolation assumes linear recovery.",
+            "perModuleBias": [
+                {"module": "regimeSurvival", "direction": "OPTIMISTIC", "reason": "Right-censoring inflates P(exit)."},
+                {"module": "transitionForecast", "direction": "OPTIMISTIC", "reason": "Median-based forecast overshoots on fast recoveries."},
+                {"module": "hitRateDecay", "direction": "CONSERVATIVE", "reason": "Exponential decay slightly underestimates early-period retention."},
+                {"module": "capitalPreservation", "direction": "CONSERVATIVE", "reason": "Assumes regime-invariant return magnitudes. SYSTEMIC losses may be fatter-tailed."},
+                {"module": "optimalReEntry", "direction": "OPTIMISTIC", "reason": "3/4 upstream biases push re-entry earlier (net PREMATURE)."},
+                {"module": "parameterUncertainty", "direction": "UNDERSTATED", "reason": "Scenario-based, not full Monte Carlo. Likely understates true CI width."},
+                {"module": "regimeProximity", "direction": "CONSERVATIVE", "reason": "Lags actual transition by 1-2 days."},
+                {"module": "regimeSurvival", "direction": "OPTIMISTIC", "reason": "Weibull shape CI includes memoryless — may overstate wearing-out effect."},
+            ],
+        },
+        "limitations": [
+            "Ensemble votes are heuristic — no formal Bayesian model combination.",
+            "Calibration comparison uses LOO where possible but n=2 for SYSTEMIC limits generalizability.",
+            "Pairwise tensions are qualitative assessments, not statistical divergence measures.",
+            "Composite reliability score uses hand-tuned weights — not empirically optimized.",
+            "Information contributions estimated via marginal CI reduction, not Shapley values.",
+            "Module independence assumption violated — several modules share upstream data (hitRateDecay feeds capitalPreservation and optimalReEntry).",
+        ],
+    }
+
+
 def signals_filtered():
     return {
         "decision": "TRADE",
@@ -991,6 +1181,7 @@ def signals_filtered():
         "optimalReEntry": _optimal_reentry_neutral(),
         "parameterUncertainty": _parameter_uncertainty_neutral(),
         "regimeSurvival": _regime_survival_neutral(),
+        "ensembleConfidence": _ensemble_confidence_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,

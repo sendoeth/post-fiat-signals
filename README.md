@@ -38,6 +38,19 @@ Live endpoint: `GET http://<your-server-ip>:8080/system/status` — same schema,
 
 `GET /signals/filtered` and `GET /regime/current` include a `regimeSurvival` object that fits a Weibull survival model to historical regime durations. Replaces the uniform CDF assumption in the optimal re-entry pipeline with a principled hazard-based model that captures **duration dependence** — whether regimes become more or less likely to end as they persist. Uses Weibull MLE via profile likelihood with Newton-Raphson refinement (n=2 SYSTEMIC periods + 1 right-censored current period). Outputs fitted Weibull parameters (k, λ) with profile-likelihood 95% CIs, current-day hazard rate h(t) and cumulative exit probability P(exit|d), duration dependence classification (WEARING_OUT/HARDENING/MEMORYLESS), conditional median remaining life, hazard and survival curves, sensitivity bands, SYSTEMIC-only vs pooled model comparison, and leave-one-out backtest against 5 historical transitions (Weibull Brier 0.478 vs Uniform 0.526, 9.1% improvement). Key finding: the Weibull tail prevents the saturation artifact of the uniform CDF — at day 14, uniform says P(exit)=100% while Weibull says 63.5%. See [`docs/REGIME_SURVIVAL.md`](docs/REGIME_SURVIVAL.md) for full derivation, field reference, and consumer code example.
 
+## Ensemble Confidence Calibrator
+
+The `ensembleConfidence` object on `/regime/current` and `/signals/filtered` synthesizes all 8 upstream modules into a single calibrated meta-confidence score.
+
+Key fields:
+- `compositeReliability.score` — 0-1 composite reliability incorporating agreement, calibration, sample size, and completeness
+- `compositeReliability.grade` — VERY_HIGH / HIGH / MODERATE / LOW / VERY_LOW
+- `crossModuleAgreement.overallAgreement` — 0-1 cross-module consensus score
+- `disagreementDiagnostic.pairwiseTensions` — detected inter-module conflicts
+- `netBiasAssessment.direction` — OPTIMISTIC / PESSIMISTIC / BALANCED
+
+See [`docs/ENSEMBLE_CONFIDENCE.md`](docs/ENSEMBLE_CONFIDENCE.md) for full field reference.
+
 ## Forward-Test Audit Dashboard
 
 **[Live Dashboard](https://sendoeth.github.io/validator/audit.html)** — 6-panel real-time monitoring surface polling the live API every 60 seconds. Shows decision status, regime proximity gradient, ledger accumulation progress (7-day milestone), system health, regime timeline, and consumer activity. Single-file HTML, zero dependencies. See [`docs/AUDIT_DASHBOARD.md`](docs/AUDIT_DASHBOARD.md) for full documentation.
