@@ -342,12 +342,142 @@ def signals_reliability():
     }
 
 
+def _hit_rate_decay_neutral():
+    """Hit rate decay model under NEUTRAL — no decay needed."""
+    return {
+        "status": "AT_NEUTRAL",
+        "message": "Regime is NEUTRAL — hit rates are at baseline. No duration decay adjustment needed.",
+        "modelVersion": "exponential-duration-v1",
+        "regimeDurationDays": 45,
+        "medianHistoricalDuration": None,
+        "historicalPeriodCount": 0,
+        "perType": None,
+        "sensitivityBands": None,
+        "calibration": None,
+    }
+
+
+def _hit_rate_decay_systemic():
+    """Hit rate decay model under SYSTEMIC — active decay with 12-day duration."""
+    return {
+        "status": "ACTIVE",
+        "message": "Hit rate decay model active for 12-day SYSTEMIC period. 3 of 3 applicable signal types have decayed below their static aggregate rates. All applicable types are below aggregate — static confidence values on this API overstate current hit probability.",
+        "modelVersion": "exponential-duration-v1",
+        "regimeDurationDays": 12,
+        "medianHistoricalDuration": 8.5,
+        "historicalPeriodCount": 2,
+        "noiseThreshold": 0.10,
+        "perType": {
+            "CRYPTO_LEADS": {
+                "label": "Crypto Leads",
+                "neutralRate": 0.82,
+                "systemicAggregate": 0.20,
+                "adjustedConfidence": 0.1124,
+                "halfLifeDays": 4.17,
+                "decayConstant": 0.1661,
+                "decayVelocityPerDay": -0.018672,
+                "daysToNoise": 12.7,
+                "daysToNoiseRemaining": 0.7,
+                "aggregateBias": {
+                    "pct": 78.0,
+                    "direction": "OVERSTATED",
+                    "explanation": "Static rate (20%) overstates current hit probability by 78%. The aggregate includes early-period observations when signals still carried residual edge.",
+                },
+                "decayApplicable": True,
+                "backtestPredictions": [
+                    {"day": 4, "predicted": 0.4173, "staticRate": 0.20, "delta": 0.2173, "note": "Above aggregate — early-period signal retention"},
+                    {"day": 13, "predicted": 0.0920, "staticRate": 0.20, "delta": -0.1080, "note": "Below aggregate — extended-period decay"},
+                ],
+                "nNeutral": 17,
+                "nSystemic": 5,
+            },
+            "SEMI_LEADS": {
+                "label": "Semi Leads",
+                "neutralRate": 0.12,
+                "systemicAggregate": 0.10,
+                "adjustedConfidence": 0.0928,
+                "halfLifeDays": 32.28,
+                "decayConstant": 0.02147,
+                "decayVelocityPerDay": -0.001992,
+                "daysToNoise": 8.5,
+                "daysToNoiseRemaining": 0.0,
+                "aggregateBias": {
+                    "pct": 7.8,
+                    "direction": "OVERSTATED",
+                    "explanation": "Static rate (10%) overstates current hit probability by 8%. The aggregate includes early-period observations when signals still carried residual edge.",
+                },
+                "decayApplicable": True,
+                "backtestPredictions": [
+                    {"day": 4, "predicted": 0.1101, "staticRate": 0.10, "delta": 0.0101, "note": "Above aggregate — early-period signal retention"},
+                    {"day": 13, "predicted": 0.0904, "staticRate": 0.10, "delta": -0.0096, "note": "Below aggregate — extended-period decay"},
+                ],
+                "nNeutral": 8,
+                "nSystemic": 10,
+            },
+            "FULL_DECOUPLE": {
+                "label": "Full Decouple",
+                "neutralRate": 0.50,
+                "systemicAggregate": 0.25,
+                "adjustedConfidence": 0.1879,
+                "halfLifeDays": 8.50,
+                "decayConstant": 0.08155,
+                "decayVelocityPerDay": -0.015323,
+                "daysToNoise": 13.8,
+                "daysToNoiseRemaining": 1.8,
+                "aggregateBias": {
+                    "pct": 33.1,
+                    "direction": "OVERSTATED",
+                    "explanation": "Static rate (25%) overstates current hit probability by 33%. The aggregate includes early-period observations when signals still carried residual edge.",
+                },
+                "decayApplicable": True,
+                "backtestPredictions": [
+                    {"day": 4, "predicted": 0.3611, "staticRate": 0.25, "delta": 0.1111, "note": "Above aggregate — early-period signal retention"},
+                    {"day": 13, "predicted": 0.1726, "staticRate": 0.25, "delta": -0.0774, "note": "Below aggregate — extended-period decay"},
+                ],
+                "nNeutral": 6,
+                "nSystemic": 4,
+            },
+        },
+        "sensitivityBands": {
+            "CRYPTO_LEADS": {
+                "conservative": {"label": "Faster decay (half-life -30%)", "halfLifeDays": 2.92, "adjustedConfidence": 0.0637},
+                "base": {"label": "Calibrated estimate", "halfLifeDays": 4.17, "adjustedConfidence": 0.1124},
+                "optimistic": {"label": "Slower decay (half-life +30%)", "halfLifeDays": 5.42, "adjustedConfidence": 0.1729},
+            },
+            "SEMI_LEADS": {
+                "conservative": {"label": "Faster decay (half-life -30%)", "halfLifeDays": 22.60, "adjustedConfidence": 0.0891},
+                "base": {"label": "Calibrated estimate", "halfLifeDays": 32.28, "adjustedConfidence": 0.0928},
+                "optimistic": {"label": "Slower decay (half-life +30%)", "halfLifeDays": 41.96, "adjustedConfidence": 0.0955},
+            },
+            "FULL_DECOUPLE": {
+                "conservative": {"label": "Faster decay (half-life -30%)", "halfLifeDays": 5.95, "adjustedConfidence": 0.1173},
+                "base": {"label": "Calibrated estimate", "halfLifeDays": 8.50, "adjustedConfidence": 0.1879},
+                "optimistic": {"label": "Slower decay (half-life +30%)", "halfLifeDays": 11.05, "adjustedConfidence": 0.2565},
+            },
+        },
+        "calibration": {
+            "model": "exponential-duration-v1",
+            "formula": "adjustedConfidence(t) = neutralRate * exp(-lambda * t), where lambda = ln(neutralRate / systemicRate) / medianDuration",
+            "calibrationProperty": "At the median historical SYSTEMIC duration (8.5d), the model output equals the empirical SYSTEMIC aggregate hit rate.",
+            "medianDurationDays": 8.5,
+            "limitations": [
+                "Only 2 historical SYSTEMIC periods available for calibration.",
+                "Per-period hit rates are not separable from the aggregate.",
+                "Zero-floor assumption: adjusted confidence approaches 0 for very long durations.",
+                "Onset lag: the model assumes instantaneous decay at SYSTEMIC onset.",
+            ],
+            "biasAnalysis": "The aggregate SYSTEMIC hit rates are duration-blind averages that overstate current hit probability for extended durations (>9d).",
+        },
+    }
+
+
 def signals_filtered():
     return {
         "decision": "TRADE",
         "decisionReason": "NEUTRAL regime — 2 actionable signals (CRYPTO_LEADS). Hit rate 82% with 8.2% avg return under this regime.",
         "regimeProximity": _regime_proximity_neutral(),
         "transitionForecast": _transition_forecast_neutral(),
+        "hitRateDecayModel": _hit_rate_decay_neutral(),
         "regimeId": "NEUTRAL",
         "regimeLabel": "Neutral — no systemic stress detected",
         "regimeConfidence": 72,
@@ -399,6 +529,9 @@ def signals_filtered():
                 "avg_return": 8.24,
                 "regime": "NEUTRAL",
                 "observed_at": _ts(),
+                "adjustedConfidence": 0.82,
+                "decayHalfLifeDays": None,
+                "daysToNoise": None,
             },
             {
                 "pair": "AMD/TAO",
@@ -420,6 +553,9 @@ def signals_filtered():
                 "avg_return": 8.24,
                 "regime": "NEUTRAL",
                 "observed_at": _ts(),
+                "adjustedConfidence": 0.82,
+                "decayHalfLifeDays": None,
+                "daysToNoise": None,
             },
             {
                 "pair": "AVGO/AKT",
@@ -441,6 +577,9 @@ def signals_filtered():
                 "avg_return": -14.60,
                 "regime": "NEUTRAL",
                 "observed_at": _ts(),
+                "adjustedConfidence": 0.12,
+                "decayHalfLifeDays": None,
+                "daysToNoise": None,
             },
             {
                 "pair": "MRVL/FET",
@@ -462,6 +601,9 @@ def signals_filtered():
                 "avg_return": -14.60,
                 "regime": "NEUTRAL",
                 "observed_at": _ts(),
+                "adjustedConfidence": 0.12,
+                "decayHalfLifeDays": None,
+                "daysToNoise": None,
             },
             {
                 "pair": "ASML/RNDR",
@@ -483,6 +625,9 @@ def signals_filtered():
                 "avg_return": 3.83,
                 "regime": "NEUTRAL",
                 "observed_at": _ts(),
+                "adjustedConfidence": 0.80,
+                "decayHalfLifeDays": None,
+                "daysToNoise": None,
             },
         ],
         "timestamp": _ts(),
