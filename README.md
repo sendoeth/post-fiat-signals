@@ -77,7 +77,7 @@ No pip install required. The SDK is a single package with no dependencies beyond
 Run every example against a built-in mock server — no live API needed:
 
 ```bash
-# 1. Start the mock server (serves all 6 endpoints with realistic test data)
+# 1. Start the mock server (serves all 9 endpoints with realistic test data)
 python3 examples/mock_server.py &
 
 # 2. Point the SDK at the mock
@@ -169,6 +169,8 @@ Everything else is WAIT. SEMI_LEADS under NEUTRAL is a documented anti-signal (1
 | `/regime/history` | 90-day regime transition timeline | `get_regime_history()` |
 | `/health` | Server health, uptime, data freshness | `get_health()` |
 | `/system/status` | Public system health surface — overall + per-component health with explanations | — |
+| `/ledger/summary` | Aggregated performance ledger stats — entry counts, days covered, NO_TRADE streak, milestone projections | — |
+| `/consumer/activity` | Recent API consumer activity — external request log, unique consumers, endpoint breakdown | — |
 
 ## Error Handling
 
