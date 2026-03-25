@@ -1,6 +1,6 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-03-25T08:15:01Z",
+  "generated_at": "2026-03-25T08:30:01Z",
   "overall_health": "HALT",
   "summary": "Signal integrity issue detected in: granger_pipeline. This is a safe halt \u2014 the system is correctly preventing reliance on potentially unreliable signals. This does NOT mean the infrastructure is broken. It means current market conditions or data quality do not meet the thresholds required for confident signal generation. Check component messages for details.",
   "components": {
@@ -67,11 +67,11 @@
       "message": "Circuit breaker is operational. API is responding, data is fresh, and no errors have been recorded.",
       "details": {
         "api_status": "ok",
-        "uptime_seconds": 392389,
+        "uptime_seconds": 393288,
         "data_age_seconds": 868,
         "is_stale": false,
         "last_error": null,
-        "refresh_count": 436,
+        "refresh_count": 437,
         "schema_version": "1.1.0"
       }
     }
