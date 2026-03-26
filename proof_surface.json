@@ -1,0 +1,1867 @@
+{
+  "meta": {
+    "producer_id": "post-fiat-signals",
+    "wallet": "rfLJ4ZRnqmGFLAcMvCD56nKGbjpdTJmMqo",
+    "generated_at": "2026-03-26T10:47:47.999895+00:00",
+    "proof_surface_version": "1.0.0",
+    "module_version": "17.1.0",
+    "date_range": {
+      "start": "2026-03-19",
+      "end": "2026-03-28"
+    },
+    "description": "Canonical proof surface for the first complete forward-test cycle closure. Resolves 2492 live crypto signals pushed to b1e55ed oracle (March 19-26, 2026) against realized hourly prices from Yahoo Finance."
+  },
+  "signal_summary": {
+    "total_loaded": 2492,
+    "total_resolved": 2128,
+    "total_unresolved": 364,
+    "resolution_rate": 0.8539,
+    "total_pre_calibration": 28,
+    "total_post_calibration": 2464,
+    "resolved_pre_calibration": 28,
+    "resolved_post_calibration": 2100
+  },
+  "price_data": {
+    "BTC": {
+      "rows": 179,
+      "start": "2026-03-19 00:00:00+00:00",
+      "end": "2026-03-26 10:00:00+00:00",
+      "gaps_filled": 0
+    },
+    "ETH": {
+      "rows": 179,
+      "start": "2026-03-19 00:00:00+00:00",
+      "end": "2026-03-26 10:00:00+00:00",
+      "gaps_filled": 0
+    },
+    "SOL": {
+      "rows": 179,
+      "start": "2026-03-19 00:00:00+00:00",
+      "end": "2026-03-26 10:00:00+00:00",
+      "gaps_filled": 0
+    },
+    "LINK": {
+      "rows": 179,
+      "start": "2026-03-19 00:00:00+00:00",
+      "end": "2026-03-26 10:00:00+00:00",
+      "gaps_filled": 0
+    }
+  },
+  "overall": {
+    "brier_decomposition": {
+      "brier_score": 0.248102,
+      "reliability": 0.000137,
+      "resolution": 0.002641,
+      "uncertainty": 0.249788,
+      "check_sum": 0.247284,
+      "n": 2128,
+      "base_rate": 0.5146,
+      "calibration_slope": {
+        "slope": 0.8122,
+        "intercept": 0.0882,
+        "r_squared": 0.0076,
+        "p_value": 5.7e-05
+      },
+      "sharpness": 0.002872,
+      "accuracy": {
+        "point": 0.514568,
+        "lower": 0.496738,
+        "upper": 0.53236,
+        "n": 2128
+      },
+      "calibration_points": [
+        {
+          "bin_center": 0.05,
+          "mean_forecast": 0.097,
+          "observed_freq": 0.0,
+          "count": 7
+        },
+        {
+          "bin_center": 0.15,
+          "mean_forecast": 0.1273,
+          "observed_freq": 0.0952,
+          "count": 21
+        },
+        {
+          "bin_center": 0.55,
+          "mean_forecast": 0.5303,
+          "observed_freq": 0.5205,
+          "count": 2100
+        }
+      ],
+      "reliability_ci": {
+        "lower": 4.6e-05,
+        "upper": 0.000912,
+        "method": "bootstrap_500"
+      },
+      "resolution_ci": {
+        "lower": 0.001581,
+        "upper": 0.003766,
+        "method": "bootstrap_500"
+      }
+    }
+  },
+  "per_symbol": {
+    "BTC": {
+      "brier_decomposition": {
+        "brier_score": 0.250082,
+        "reliability": 0.00363,
+        "resolution": 0.00346,
+        "uncertainty": 0.249912,
+        "check_sum": 0.250082,
+        "n": 532,
+        "base_rate": 0.5094,
+        "calibration_slope": {
+          "slope": 1.0781,
+          "intercept": -0.1046,
+          "r_squared": 0.0138,
+          "p_value": 0.006589
+        },
+        "sharpness": 0.002977,
+        "accuracy": {
+          "point": 0.509398,
+          "lower": 0.473788,
+          "upper": 0.544914,
+          "n": 532
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.1,
+            "mean_forecast": 0.097,
+            "observed_freq": 0.0,
+            "count": 7
+          },
+          {
+            "bin_center": 0.5,
+            "mean_forecast": 0.5758,
+            "observed_freq": 0.5162,
+            "count": 525
+          }
+        ],
+        "reliability_ci": {
+          "lower": 0.000745,
+          "upper": 0.008983,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0.001375,
+          "upper": 0.005599,
+          "method": "bootstrap_500"
+        }
+      },
+      "signal_count": 532
+    },
+    "ETH": {
+      "brier_decomposition": {
+        "brier_score": 0.247104,
+        "reliability": 0.00111,
+        "resolution": 0.002137,
+        "uncertainty": 0.248131,
+        "check_sum": 0.247104,
+        "n": 532,
+        "base_rate": 0.5432,
+        "calibration_slope": {
+          "slope": 1.0113,
+          "intercept": 0.0276,
+          "r_squared": 0.0086,
+          "p_value": 0.032333
+        },
+        "sharpness": 0.00209,
+        "accuracy": {
+          "point": 0.543233,
+          "lower": 0.507577,
+          "upper": 0.578451,
+          "n": 532
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.1,
+            "mean_forecast": 0.114,
+            "observed_freq": 0.1429,
+            "count": 7
+          },
+          {
+            "bin_center": 0.5,
+            "mean_forecast": 0.5152,
+            "observed_freq": 0.5486,
+            "count": 525
+          }
+        ],
+        "reliability_ci": {
+          "lower": 0.000128,
+          "upper": 0.004792,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0.000245,
+          "upper": 0.005043,
+          "method": "bootstrap_500"
+        }
+      },
+      "signal_count": 532
+    },
+    "SOL": {
+      "brier_decomposition": {
+        "brier_score": 0.248814,
+        "reliability": 0.005012,
+        "resolution": 0.00258,
+        "uncertainty": 0.246382,
+        "check_sum": 0.248814,
+        "n": 532,
+        "base_rate": 0.4398,
+        "calibration_slope": {
+          "slope": 1.1785,
+          "intercept": -0.1615,
+          "r_squared": 0.0105,
+          "p_value": 0.01824
+        },
+        "sharpness": 0.001857,
+        "accuracy": {
+          "point": 0.43985,
+          "lower": 0.404841,
+          "upper": 0.475467,
+          "n": 532
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.1,
+            "mean_forecast": 0.137,
+            "observed_freq": 0.0,
+            "count": 7
+          },
+          {
+            "bin_center": 0.5,
+            "mean_forecast": 0.5152,
+            "observed_freq": 0.4457,
+            "count": 525
+          }
+        ],
+        "reliability_ci": {
+          "lower": 0.001289,
+          "upper": 0.011419,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0.000968,
+          "upper": 0.004362,
+          "method": "bootstrap_500"
+        }
+      },
+      "signal_count": 532
+    },
+    "LINK": {
+      "brier_decomposition": {
+        "brier_score": 0.246409,
+        "reliability": 0.003122,
+        "resolution": 0.002385,
+        "uncertainty": 0.245672,
+        "check_sum": 0.246409,
+        "n": 532,
+        "base_rate": 0.5658,
+        "calibration_slope": {
+          "slope": 1.1155,
+          "intercept": -0.0033,
+          "r_squared": 0.0097,
+          "p_value": 0.02304
+        },
+        "sharpness": 0.001917,
+        "accuracy": {
+          "point": 0.565789,
+          "lower": 0.530195,
+          "upper": 0.600718,
+          "n": 532
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.1,
+            "mean_forecast": 0.131,
+            "observed_freq": 0.1429,
+            "count": 7
+          },
+          {
+            "bin_center": 0.5,
+            "mean_forecast": 0.5152,
+            "observed_freq": 0.5714,
+            "count": 525
+          }
+        ],
+        "reliability_ci": {
+          "lower": 0.000615,
+          "upper": 0.007766,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0.000316,
+          "upper": 0.005628,
+          "method": "bootstrap_500"
+        }
+      },
+      "signal_count": 532
+    }
+  },
+  "per_method": {
+    "arbitrary_beta": {
+      "brier_decomposition": {
+        "brier_score": 0.068512,
+        "reliability": 0.002335,
+        "resolution": 0.0,
+        "uncertainty": 0.066327,
+        "check_sum": 0.068661,
+        "n": 28,
+        "base_rate": 0.0714,
+        "calibration_slope": {
+          "slope": 0.8061,
+          "intercept": -0.0251,
+          "r_squared": 0.0024,
+          "p_value": 0.804988
+        },
+        "sharpness": 0.000244,
+        "accuracy": {
+          "point": 0.071429,
+          "lower": 0.023923,
+          "upper": 0.194471,
+          "n": 28
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.1,
+            "mean_forecast": 0.1197,
+            "observed_freq": 0.0714,
+            "count": 28
+          }
+        ],
+        "reliability_ci": {
+          "lower": 0.00012,
+          "upper": 0.014394,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0,
+          "upper": 0.0,
+          "method": "bootstrap_500"
+        }
+      }
+    },
+    "calibrated": {
+      "brier_decomposition": {
+        "brier_score": 0.250497,
+        "reliability": 9.7e-05,
+        "resolution": 0.0,
+        "uncertainty": 0.249581,
+        "check_sum": 0.249678,
+        "n": 2100,
+        "base_rate": 0.5205,
+        "calibration_slope": {
+          "slope": -0.0943,
+          "intercept": 0.5705,
+          "r_squared": 0.0,
+          "p_value": 0.820552
+        },
+        "sharpness": 0.000689,
+        "accuracy": {
+          "point": 0.520476,
+          "lower": 0.502528,
+          "upper": 0.538372,
+          "n": 2100
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.5,
+            "mean_forecast": 0.5303,
+            "observed_freq": 0.5205,
+            "count": 2100
+          }
+        ],
+        "reliability_ci": {
+          "lower": 1e-06,
+          "upper": 0.000785,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0,
+          "upper": 0.0,
+          "method": "bootstrap_500"
+        }
+      }
+    }
+  },
+  "natural_experiment": {
+    "pre_calibration": {
+      "label": "pre_calibration",
+      "n": 28,
+      "accuracy": {
+        "point": 0.071429,
+        "lower": 0.023923,
+        "upper": 0.194471,
+        "n": 28
+      },
+      "mean_brier_score": 0.068512,
+      "mean_confidence": 0.1198,
+      "mean_pct_change": 0.005325,
+      "brier_decomposition": {
+        "brier_score": 0.068512,
+        "reliability": 0.002335,
+        "resolution": 0.0,
+        "uncertainty": 0.066327,
+        "check_sum": 0.068661,
+        "n": 28,
+        "base_rate": 0.0714,
+        "calibration_slope": {
+          "slope": 0.8061,
+          "intercept": -0.0251,
+          "r_squared": 0.0024,
+          "p_value": 0.804988
+        },
+        "sharpness": 0.000244,
+        "accuracy": {
+          "point": 0.071429,
+          "lower": 0.023923,
+          "upper": 0.194471,
+          "n": 28
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.1,
+            "mean_forecast": 0.1197,
+            "observed_freq": 0.0714,
+            "count": 28
+          }
+        ],
+        "reliability_ci": {
+          "lower": 0.00012,
+          "upper": 0.014394,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0,
+          "upper": 0.0,
+          "method": "bootstrap_500"
+        }
+      },
+      "per_symbol_accuracy": {
+        "BTC": {
+          "point": 0.0,
+          "lower": 0,
+          "upper": 0.278798,
+          "n": 7
+        },
+        "ETH": {
+          "point": 0.142857,
+          "lower": 0.03254,
+          "upper": 0.452316,
+          "n": 7
+        },
+        "SOL": {
+          "point": 0.0,
+          "lower": 0,
+          "upper": 0.278798,
+          "n": 7
+        },
+        "LINK": {
+          "point": 0.142857,
+          "lower": 0.03254,
+          "upper": 0.452316,
+          "n": 7
+        }
+      },
+      "directions": {
+        "bullish": 0,
+        "bearish": 28
+      }
+    },
+    "post_calibration": {
+      "label": "post_calibration",
+      "n": 2100,
+      "accuracy": {
+        "point": 0.520476,
+        "lower": 0.502528,
+        "upper": 0.538372,
+        "n": 2100
+      },
+      "mean_brier_score": 0.250497,
+      "mean_confidence": 0.5303,
+      "mean_pct_change": 0.00215,
+      "brier_decomposition": {
+        "brier_score": 0.250497,
+        "reliability": 9.7e-05,
+        "resolution": 0.0,
+        "uncertainty": 0.249581,
+        "check_sum": 0.249678,
+        "n": 2100,
+        "base_rate": 0.5205,
+        "calibration_slope": {
+          "slope": -0.0943,
+          "intercept": 0.5705,
+          "r_squared": 0.0,
+          "p_value": 0.820552
+        },
+        "sharpness": 0.000689,
+        "accuracy": {
+          "point": 0.520476,
+          "lower": 0.502528,
+          "upper": 0.538372,
+          "n": 2100
+        },
+        "calibration_points": [
+          {
+            "bin_center": 0.5,
+            "mean_forecast": 0.5303,
+            "observed_freq": 0.5205,
+            "count": 2100
+          }
+        ],
+        "reliability_ci": {
+          "lower": 1e-06,
+          "upper": 0.000785,
+          "method": "bootstrap_500"
+        },
+        "resolution_ci": {
+          "lower": 0,
+          "upper": 0.0,
+          "method": "bootstrap_500"
+        }
+      },
+      "per_symbol_accuracy": {
+        "BTC": {
+          "point": 0.51619,
+          "lower": 0.480321,
+          "upper": 0.551893,
+          "n": 525
+        },
+        "ETH": {
+          "point": 0.548571,
+          "lower": 0.512686,
+          "upper": 0.583959,
+          "n": 525
+        },
+        "SOL": {
+          "point": 0.445714,
+          "lower": 0.410399,
+          "upper": 0.481587,
+          "n": 525
+        },
+        "LINK": {
+          "point": 0.571429,
+          "lower": 0.535623,
+          "upper": 0.606502,
+          "n": 525
+        }
+      },
+      "directions": {
+        "bullish": 1575,
+        "bearish": 525
+      }
+    },
+    "comparison": {
+      "accuracy_delta": 0.449,
+      "brier_delta": 0.181985,
+      "fisher_exact_p": 1e-06,
+      "calibration_improved": true
+    },
+    "sample_sizes": {
+      "pre": 28,
+      "post": 2100
+    }
+  },
+  "karma_validation": {
+    "per_symbol": {
+      "BTC": {
+        "predicted_karma": 0.085114,
+        "realized_karma": 0.017123,
+        "prediction_error": -0.067991,
+        "hit_rate": {
+          "point": 0.509398,
+          "lower": 0.473788,
+          "upper": 0.544914,
+          "n": 532
+        },
+        "n": 532,
+        "mean_confidence": 0.5695
+      },
+      "ETH": {
+        "predicted_karma": 0.014298,
+        "realized_karma": 0.048318,
+        "prediction_error": 0.03402,
+        "hit_rate": {
+          "point": 0.543233,
+          "lower": 0.507577,
+          "upper": 0.578451,
+          "n": 532
+        },
+        "n": 532,
+        "mean_confidence": 0.5099
+      },
+      "SOL": {
+        "predicted_karma": 0.014147,
+        "realized_karma": -0.057003,
+        "prediction_error": -0.07115,
+        "hit_rate": {
+          "point": 0.43985,
+          "lower": 0.404841,
+          "upper": 0.475467,
+          "n": 532
+        },
+        "n": 532,
+        "mean_confidence": 0.5102
+      },
+      "LINK": {
+        "predicted_karma": 0.014184,
+        "realized_karma": 0.0714,
+        "prediction_error": 0.057216,
+        "hit_rate": {
+          "point": 0.565789,
+          "lower": 0.530195,
+          "upper": 0.600718,
+          "n": 532
+        },
+        "n": 532,
+        "mean_confidence": 0.5101
+      }
+    },
+    "predicted_karma": 0.031936,
+    "realized_karma": 0.01996,
+    "prediction_error": -0.011976,
+    "n": 2128
+  },
+  "confidence_weighted_accuracy": {
+    "confidence_weighted_accuracy": 0.519011,
+    "binary_accuracy": 0.514568,
+    "delta": 0.004444,
+    "delta_interpretation": "positive = high-confidence signals outperform average",
+    "confidence_outcome_correlation": {
+      "pearson_r": 0.087092,
+      "p_value": 5.7e-05,
+      "significant_at_90pct": true
+    },
+    "bootstrap_ci_90pct": {
+      "lower": 0.50109,
+      "upper": 0.537742,
+      "method": "bootstrap_1000"
+    },
+    "n": 2128,
+    "mean_confidence": 0.524947,
+    "std_confidence": 0.05359
+  },
+  "confidence_bracket_analysis": {
+    "brackets": {
+      "LOW_0_30": {
+        "range": [
+          0.0,
+          0.3
+        ],
+        "n": 28,
+        "accuracy": {
+          "point": 0.071429,
+          "lower": 0.023923,
+          "upper": 0.194471,
+          "n": 28
+        },
+        "mean_confidence": 0.11975,
+        "mean_brier": 0.068512,
+        "calibration_gap": 0.048321
+      },
+      "MEDIUM_30_50": {
+        "range": [
+          0.3,
+          0.5
+        ],
+        "n": 0,
+        "accuracy": null,
+        "mean_confidence": null
+      },
+      "HIGH_50_60": {
+        "range": [
+          0.5,
+          0.6
+        ],
+        "n": 2100,
+        "accuracy": {
+          "point": 0.520476,
+          "lower": 0.502528,
+          "upper": 0.538372,
+          "n": 2100
+        },
+        "mean_confidence": 0.53035,
+        "mean_brier": 0.250497,
+        "calibration_gap": 0.009874
+      },
+      "VERY_HIGH_60_plus": {
+        "range": [
+          0.6,
+          1.01
+        ],
+        "n": 0,
+        "accuracy": null,
+        "mean_confidence": null
+      }
+    },
+    "monotonicity_test": {
+      "is_monotonic": true,
+      "interpretation": "accuracy increases with confidence bracket \u2014 calibration adds value",
+      "bracket_accuracies": [
+        {
+          "bracket": "LOW_0_30",
+          "accuracy": 0.0714,
+          "n": 28
+        },
+        {
+          "bracket": "HIGH_50_60",
+          "accuracy": 0.5205,
+          "n": 2100
+        }
+      ]
+    },
+    "n": 2128
+  },
+  "karma_trajectory": {
+    "cumulative_curve": [
+      {
+        "timestamp": "2026-03-19T23:31:53.295658+00:00",
+        "cumulative_karma": -0.097,
+        "running_mean": -0.097,
+        "n": 1
+      },
+      {
+        "timestamp": "2026-03-20T01:33:01.389594+00:00",
+        "cumulative_karma": -5.1966,
+        "running_mean": -0.120851,
+        "n": 43
+      },
+      {
+        "timestamp": "2026-03-20T04:18:02.037478+00:00",
+        "cumulative_karma": -5.4996,
+        "running_mean": -0.064701,
+        "n": 85
+      },
+      {
+        "timestamp": "2026-03-20T06:48:01.952225+00:00",
+        "cumulative_karma": -2.0448,
+        "running_mean": -0.016101,
+        "n": 127
+      },
+      {
+        "timestamp": "2026-03-20T09:33:01.254205+00:00",
+        "cumulative_karma": -6.3482,
+        "running_mean": -0.037563,
+        "n": 169
+      },
+      {
+        "timestamp": "2026-03-20T12:03:01.804981+00:00",
+        "cumulative_karma": -3.0146,
+        "running_mean": -0.014287,
+        "n": 211
+      },
+      {
+        "timestamp": "2026-03-20T14:48:01.533169+00:00",
+        "cumulative_karma": 8.9864,
+        "running_mean": 0.035519,
+        "n": 253
+      },
+      {
+        "timestamp": "2026-03-20T17:18:01.932232+00:00",
+        "cumulative_karma": 19.8964,
+        "running_mean": 0.067445,
+        "n": 295
+      },
+      {
+        "timestamp": "2026-03-20T20:03:01.644932+00:00",
+        "cumulative_karma": 31.8974,
+        "running_mean": 0.094651,
+        "n": 337
+      },
+      {
+        "timestamp": "2026-03-20T22:33:01.426237+00:00",
+        "cumulative_karma": 24.1998,
+        "running_mean": 0.063852,
+        "n": 379
+      },
+      {
+        "timestamp": "2026-03-21T01:18:01.627207+00:00",
+        "cumulative_karma": 12.1988,
+        "running_mean": 0.028976,
+        "n": 421
+      },
+      {
+        "timestamp": "2026-03-21T03:48:01.333578+00:00",
+        "cumulative_karma": 1.2888,
+        "running_mean": 0.002784,
+        "n": 463
+      },
+      {
+        "timestamp": "2026-03-21T06:33:01.674579+00:00",
+        "cumulative_karma": -10.7122,
+        "running_mean": -0.021212,
+        "n": 505
+      },
+      {
+        "timestamp": "2026-03-21T09:03:01.744905+00:00",
+        "cumulative_karma": -21.6222,
+        "running_mean": -0.039529,
+        "n": 547
+      },
+      {
+        "timestamp": "2026-03-21T11:48:01.803126+00:00",
+        "cumulative_karma": -33.6232,
+        "running_mean": -0.057085,
+        "n": 589
+      },
+      {
+        "timestamp": "2026-03-21T14:18:01.479311+00:00",
+        "cumulative_karma": -44.5332,
+        "running_mean": -0.070576,
+        "n": 631
+      },
+      {
+        "timestamp": "2026-03-21T17:03:01.138790+00:00",
+        "cumulative_karma": -56.5342,
+        "running_mean": -0.084003,
+        "n": 673
+      },
+      {
+        "timestamp": "2026-03-21T19:33:01.277032+00:00",
+        "cumulative_karma": -67.4442,
+        "running_mean": -0.094328,
+        "n": 715
+      },
+      {
+        "timestamp": "2026-03-21T22:18:01.824370+00:00",
+        "cumulative_karma": -79.4452,
+        "running_mean": -0.104947,
+        "n": 757
+      },
+      {
+        "timestamp": "2026-03-22T00:48:01.567121+00:00",
+        "cumulative_karma": -90.3552,
+        "running_mean": -0.113085,
+        "n": 799
+      },
+      {
+        "timestamp": "2026-03-22T03:33:01.104909+00:00",
+        "cumulative_karma": -102.3562,
+        "running_mean": -0.121708,
+        "n": 841
+      },
+      {
+        "timestamp": "2026-03-22T06:03:01.245639+00:00",
+        "cumulative_karma": -113.2662,
+        "running_mean": -0.128274,
+        "n": 883
+      },
+      {
+        "timestamp": "2026-03-22T08:48:01.264572+00:00",
+        "cumulative_karma": -125.2672,
+        "running_mean": -0.135424,
+        "n": 925
+      },
+      {
+        "timestamp": "2026-03-22T11:18:02.047878+00:00",
+        "cumulative_karma": -128.4796,
+        "running_mean": -0.132864,
+        "n": 967
+      },
+      {
+        "timestamp": "2026-03-22T14:03:01.340174+00:00",
+        "cumulative_karma": -116.4786,
+        "running_mean": -0.11544,
+        "n": 1009
+      },
+      {
+        "timestamp": "2026-03-22T16:33:01.654286+00:00",
+        "cumulative_karma": -105.5686,
+        "running_mean": -0.100446,
+        "n": 1051
+      },
+      {
+        "timestamp": "2026-03-22T19:18:01.482668+00:00",
+        "cumulative_karma": -93.5676,
+        "running_mean": -0.085606,
+        "n": 1093
+      },
+      {
+        "timestamp": "2026-03-22T21:48:01.296598+00:00",
+        "cumulative_karma": -82.6576,
+        "running_mean": -0.072826,
+        "n": 1135
+      },
+      {
+        "timestamp": "2026-03-23T00:33:01.447140+00:00",
+        "cumulative_karma": -70.6566,
+        "running_mean": -0.060031,
+        "n": 1177
+      },
+      {
+        "timestamp": "2026-03-23T03:03:01.967250+00:00",
+        "cumulative_karma": -59.7466,
+        "running_mean": -0.049013,
+        "n": 1219
+      },
+      {
+        "timestamp": "2026-03-23T05:48:01.144989+00:00",
+        "cumulative_karma": -47.7456,
+        "running_mean": -0.037863,
+        "n": 1261
+      },
+      {
+        "timestamp": "2026-03-23T08:18:01.937743+00:00",
+        "cumulative_karma": -36.8356,
+        "running_mean": -0.02827,
+        "n": 1303
+      },
+      {
+        "timestamp": "2026-03-23T11:03:01.458374+00:00",
+        "cumulative_karma": -24.8346,
+        "running_mean": -0.018464,
+        "n": 1345
+      },
+      {
+        "timestamp": "2026-03-23T13:33:01.113123+00:00",
+        "cumulative_karma": -23.8042,
+        "running_mean": -0.017162,
+        "n": 1387
+      },
+      {
+        "timestamp": "2026-03-23T16:18:01.469873+00:00",
+        "cumulative_karma": -24.4708,
+        "running_mean": -0.017124,
+        "n": 1429
+      },
+      {
+        "timestamp": "2026-03-23T18:48:01.497270+00:00",
+        "cumulative_karma": -34.3504,
+        "running_mean": -0.023352,
+        "n": 1471
+      },
+      {
+        "timestamp": "2026-03-23T21:33:01.330495+00:00",
+        "cumulative_karma": -38.1082,
+        "running_mean": -0.025187,
+        "n": 1513
+      },
+      {
+        "timestamp": "2026-03-24T00:03:01.461864+00:00",
+        "cumulative_karma": -31.1378,
+        "running_mean": -0.020024,
+        "n": 1555
+      },
+      {
+        "timestamp": "2026-03-24T02:48:01.896256+00:00",
+        "cumulative_karma": -19.1368,
+        "running_mean": -0.011983,
+        "n": 1597
+      },
+      {
+        "timestamp": "2026-03-24T05:18:01.230962+00:00",
+        "cumulative_karma": -8.2268,
+        "running_mean": -0.005019,
+        "n": 1639
+      },
+      {
+        "timestamp": "2026-03-24T08:03:01.921685+00:00",
+        "cumulative_karma": -4.9538,
+        "running_mean": -0.002947,
+        "n": 1681
+      },
+      {
+        "timestamp": "2026-03-24T10:33:01.947972+00:00",
+        "cumulative_karma": 5.9562,
+        "running_mean": 0.003457,
+        "n": 1723
+      },
+      {
+        "timestamp": "2026-03-24T13:18:01.319734+00:00",
+        "cumulative_karma": 17.9572,
+        "running_mean": 0.010174,
+        "n": 1765
+      },
+      {
+        "timestamp": "2026-03-24T15:48:01.315878+00:00",
+        "cumulative_karma": 28.8672,
+        "running_mean": 0.015975,
+        "n": 1807
+      },
+      {
+        "timestamp": "2026-03-24T18:33:01.071034+00:00",
+        "cumulative_karma": 40.8682,
+        "running_mean": 0.022103,
+        "n": 1849
+      },
+      {
+        "timestamp": "2026-03-24T21:03:01.337022+00:00",
+        "cumulative_karma": 51.7782,
+        "running_mean": 0.027381,
+        "n": 1891
+      },
+      {
+        "timestamp": "2026-03-24T23:48:01.931165+00:00",
+        "cumulative_karma": 63.7792,
+        "running_mean": 0.032995,
+        "n": 1933
+      },
+      {
+        "timestamp": "2026-03-25T02:18:01.593416+00:00",
+        "cumulative_karma": 74.6892,
+        "running_mean": 0.037817,
+        "n": 1975
+      },
+      {
+        "timestamp": "2026-03-25T05:03:01.084125+00:00",
+        "cumulative_karma": 72.4466,
+        "running_mean": 0.035918,
+        "n": 2017
+      },
+      {
+        "timestamp": "2026-03-25T07:33:01.410067+00:00",
+        "cumulative_karma": 61.5366,
+        "running_mean": 0.029887,
+        "n": 2059
+      },
+      {
+        "timestamp": "2026-03-25T10:18:01.415984+00:00",
+        "cumulative_karma": 49.5356,
+        "running_mean": 0.023577,
+        "n": 2101
+      },
+      {
+        "timestamp": "2026-03-25T11:48:01.680353+00:00",
+        "cumulative_karma": 42.4744,
+        "running_mean": 0.01996,
+        "n": 2128
+      }
+    ],
+    "rolling_karma": [
+      {
+        "center_idx": 99,
+        "timestamp": "2026-03-20T05:03:01.143866+00:00",
+        "rolling_mean_karma": -0.05833,
+        "window_size": 100
+      },
+      {
+        "center_idx": 166,
+        "timestamp": "2026-03-20T09:18:01.720912+00:00",
+        "rolling_mean_karma": -0.041822,
+        "window_size": 100
+      },
+      {
+        "center_idx": 233,
+        "timestamp": "2026-03-20T13:33:01.750080+00:00",
+        "rolling_mean_karma": 0.056974,
+        "window_size": 100
+      },
+      {
+        "center_idx": 300,
+        "timestamp": "2026-03-20T17:48:01.362053+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 367,
+        "timestamp": "2026-03-20T21:48:01.054566+00:00",
+        "rolling_mean_karma": 0.14183,
+        "window_size": 100
+      },
+      {
+        "center_idx": 434,
+        "timestamp": "2026-03-21T02:03:01.919722+00:00",
+        "rolling_mean_karma": -0.218806,
+        "window_size": 100
+      },
+      {
+        "center_idx": 501,
+        "timestamp": "2026-03-21T06:18:01.608839+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 568,
+        "timestamp": "2026-03-21T10:33:01.180718+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 635,
+        "timestamp": "2026-03-21T14:33:01.179587+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 702,
+        "timestamp": "2026-03-21T18:48:01.358918+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 769,
+        "timestamp": "2026-03-21T23:03:01.998512+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 836,
+        "timestamp": "2026-03-22T03:18:01.836509+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 903,
+        "timestamp": "2026-03-22T07:18:01.377951+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 970,
+        "timestamp": "2026-03-22T11:33:01.479626+00:00",
+        "rolling_mean_karma": -0.173954,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1037,
+        "timestamp": "2026-03-22T15:48:01.626319+00:00",
+        "rolling_mean_karma": 0.20729,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1104,
+        "timestamp": "2026-03-22T20:03:01.212424+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1171,
+        "timestamp": "2026-03-23T00:03:02.002695+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1238,
+        "timestamp": "2026-03-23T04:18:01.714162+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1305,
+        "timestamp": "2026-03-23T08:33:01.474137+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1372,
+        "timestamp": "2026-03-23T12:48:01.839042+00:00",
+        "rolling_mean_karma": 0.239414,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1439,
+        "timestamp": "2026-03-23T16:48:01.763588+00:00",
+        "rolling_mean_karma": 0.003638,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1506,
+        "timestamp": "2026-03-23T21:03:01.465464+00:00",
+        "rolling_mean_karma": -0.11819,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1573,
+        "timestamp": "2026-03-24T01:18:01.724651+00:00",
+        "rolling_mean_karma": 0.10789,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1640,
+        "timestamp": "2026-03-24T05:33:01.394751+00:00",
+        "rolling_mean_karma": 0.283054,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1707,
+        "timestamp": "2026-03-24T09:33:01.938975+00:00",
+        "rolling_mean_karma": 0.18547,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1774,
+        "timestamp": "2026-03-24T13:48:01.078636+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1841,
+        "timestamp": "2026-03-24T18:03:01.106851+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1908,
+        "timestamp": "2026-03-24T22:18:01.776342+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 1975,
+        "timestamp": "2026-03-25T02:18:01.593416+00:00",
+        "rolling_mean_karma": 0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 2042,
+        "timestamp": "2026-03-25T06:33:01.722425+00:00",
+        "rolling_mean_karma": -0.000606,
+        "window_size": 100
+      },
+      {
+        "center_idx": 2109,
+        "timestamp": "2026-03-25T10:48:01.659660+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      },
+      {
+        "center_idx": 2127,
+        "timestamp": "2026-03-25T11:48:01.680353+00:00",
+        "rolling_mean_karma": -0.27275,
+        "window_size": 100
+      }
+    ],
+    "per_symbol_karma": {
+      "BTC": {
+        "total_karma": 9.1096,
+        "mean_karma": 0.017123,
+        "n": 532
+      },
+      "ETH": {
+        "total_karma": 25.7052,
+        "mean_karma": 0.048318,
+        "n": 532
+      },
+      "SOL": {
+        "total_karma": -30.3254,
+        "mean_karma": -0.057003,
+        "n": 532
+      },
+      "LINK": {
+        "total_karma": 37.985,
+        "mean_karma": 0.0714,
+        "n": 532
+      }
+    },
+    "convergence": {
+      "final_mean_karma": 0.01996,
+      "last_quarter_std": 0.01508,
+      "is_converging": false,
+      "interpretation": "running mean still varying \u2014 karma estimate may shift with more data"
+    },
+    "karma_by_regime_duration": {
+      "10_15d": {
+        "mean_karma": -0.11034,
+        "accuracy": {
+          "point": 0.38648,
+          "lower": 0.358309,
+          "upper": 0.415431,
+          "n": 784
+        },
+        "n": 784
+      },
+      "15_20d": {
+        "mean_karma": 0.095968,
+        "accuracy": {
+          "point": 0.589286,
+          "lower": 0.567053,
+          "upper": 0.61116,
+          "n": 1344
+        },
+        "n": 1344
+      }
+    },
+    "final_cumulative_karma": 42.4744,
+    "final_mean_karma": 0.01996,
+    "n": 2128,
+    "window_size_used": 100
+  },
+  "accuracy_evolution": {
+    "checkpoints": [
+      {
+        "n": 10,
+        "timestamp": "2026-03-19T23:33:01.976560+00:00",
+        "accuracy": {
+          "point": 0.0,
+          "lower": 0,
+          "upper": 0.212972,
+          "n": 10
+        },
+        "cumulative_correct": 0
+      },
+      {
+        "n": 25,
+        "timestamp": "2026-03-20T00:33:02.005618+00:00",
+        "accuracy": {
+          "point": 0.0,
+          "lower": 0,
+          "upper": 0.097669,
+          "n": 25
+        },
+        "cumulative_correct": 0
+      },
+      {
+        "n": 50,
+        "timestamp": "2026-03-20T02:03:01.744810+00:00",
+        "accuracy": {
+          "point": 0.26,
+          "lower": 0.172172,
+          "upper": 0.372472,
+          "n": 50
+        },
+        "cumulative_correct": 13
+      },
+      {
+        "n": 100,
+        "timestamp": "2026-03-20T05:03:01.143866+00:00",
+        "accuracy": {
+          "point": 0.35,
+          "lower": 0.27643,
+          "upper": 0.431474,
+          "n": 100
+        },
+        "cumulative_correct": 35
+      },
+      {
+        "n": 200,
+        "timestamp": "2026-03-20T11:18:01.384349+00:00",
+        "accuracy": {
+          "point": 0.425,
+          "lower": 0.368876,
+          "upper": 0.483126,
+          "n": 200
+        },
+        "cumulative_correct": 85
+      },
+      {
+        "n": 500,
+        "timestamp": "2026-03-21T06:03:01.732384+00:00",
+        "accuracy": {
+          "point": 0.464,
+          "lower": 0.427604,
+          "upper": 0.500783,
+          "n": 500
+        },
+        "cumulative_correct": 232
+      },
+      {
+        "n": 1000,
+        "timestamp": "2026-03-22T13:18:01.725173+00:00",
+        "accuracy": {
+          "point": 0.381,
+          "lower": 0.356091,
+          "upper": 0.406551,
+          "n": 1000
+        },
+        "cumulative_correct": 381
+      },
+      {
+        "n": 1500,
+        "timestamp": "2026-03-23T20:33:01.800813+00:00",
+        "accuracy": {
+          "point": 0.471333,
+          "lower": 0.450202,
+          "upper": 0.492568,
+          "n": 1500
+        },
+        "cumulative_correct": 707
+      },
+      {
+        "n": 2000,
+        "timestamp": "2026-03-25T03:48:01.576002+00:00",
+        "accuracy": {
+          "point": 0.5315,
+          "lower": 0.513115,
+          "upper": 0.5498,
+          "n": 2000
+        },
+        "cumulative_correct": 1063
+      },
+      {
+        "n": 2128,
+        "timestamp": "2026-03-25T11:48:01.680353+00:00",
+        "accuracy": {
+          "point": 0.514568,
+          "lower": 0.496738,
+          "upper": 0.53236,
+          "n": 2128
+        },
+        "cumulative_correct": 1095
+      }
+    ],
+    "per_symbol_evolution": {
+      "BTC": [
+        {
+          "n": 10,
+          "accuracy": {
+            "point": 0.3,
+            "lower": 0.126867,
+            "upper": 0.558322,
+            "n": 10
+          }
+        },
+        {
+          "n": 25,
+          "accuracy": {
+            "point": 0.4,
+            "lower": 0.256352,
+            "upper": 0.563181,
+            "n": 25
+          }
+        },
+        {
+          "n": 50,
+          "accuracy": {
+            "point": 0.46,
+            "lower": 0.349104,
+            "upper": 0.575003,
+            "n": 50
+          }
+        },
+        {
+          "n": 100,
+          "accuracy": {
+            "point": 0.59,
+            "lower": 0.50776,
+            "upper": 0.667498,
+            "n": 100
+          }
+        },
+        {
+          "n": 200,
+          "accuracy": {
+            "point": 0.295,
+            "lower": 0.244974,
+            "upper": 0.350499,
+            "n": 200
+          }
+        },
+        {
+          "n": 500,
+          "accuracy": {
+            "point": 0.542,
+            "lower": 0.505219,
+            "upper": 0.578329,
+            "n": 500
+          }
+        },
+        {
+          "n": 532,
+          "accuracy": {
+            "point": 0.509398,
+            "lower": 0.473788,
+            "upper": 0.544914,
+            "n": 532
+          }
+        }
+      ],
+      "ETH": [
+        {
+          "n": 10,
+          "accuracy": {
+            "point": 0.1,
+            "lower": 0.022632,
+            "upper": 0.347745,
+            "n": 10
+          }
+        },
+        {
+          "n": 25,
+          "accuracy": {
+            "point": 0.64,
+            "lower": 0.475694,
+            "upper": 0.776958,
+            "n": 25
+          }
+        },
+        {
+          "n": 50,
+          "accuracy": {
+            "point": 0.74,
+            "lower": 0.627528,
+            "upper": 0.827828,
+            "n": 50
+          }
+        },
+        {
+          "n": 100,
+          "accuracy": {
+            "point": 0.77,
+            "lower": 0.694208,
+            "upper": 0.831565,
+            "n": 100
+          }
+        },
+        {
+          "n": 200,
+          "accuracy": {
+            "point": 0.385,
+            "lower": 0.330293,
+            "upper": 0.442777,
+            "n": 200
+          }
+        },
+        {
+          "n": 500,
+          "accuracy": {
+            "point": 0.578,
+            "lower": 0.541343,
+            "upper": 0.613818,
+            "n": 500
+          }
+        },
+        {
+          "n": 532,
+          "accuracy": {
+            "point": 0.543233,
+            "lower": 0.507577,
+            "upper": 0.578451,
+            "n": 532
+          }
+        }
+      ],
+      "SOL": [
+        {
+          "n": 10,
+          "accuracy": {
+            "point": 0.0,
+            "lower": 0,
+            "upper": 0.212972,
+            "n": 10
+          }
+        },
+        {
+          "n": 25,
+          "accuracy": {
+            "point": 0.0,
+            "lower": 0,
+            "upper": 0.097669,
+            "n": 25
+          }
+        },
+        {
+          "n": 50,
+          "accuracy": {
+            "point": 0.0,
+            "lower": 0,
+            "upper": 0.051342,
+            "n": 50
+          }
+        },
+        {
+          "n": 100,
+          "accuracy": {
+            "point": 0.1,
+            "lower": 0.060716,
+            "upper": 0.160362,
+            "n": 100
+          }
+        },
+        {
+          "n": 200,
+          "accuracy": {
+            "point": 0.55,
+            "lower": 0.491848,
+            "upper": 0.606817,
+            "n": 200
+          }
+        },
+        {
+          "n": 500,
+          "accuracy": {
+            "point": 0.404,
+            "lower": 0.368511,
+            "upper": 0.440522,
+            "n": 500
+          }
+        },
+        {
+          "n": 532,
+          "accuracy": {
+            "point": 0.43985,
+            "lower": 0.404841,
+            "upper": 0.475467,
+            "n": 532
+          }
+        }
+      ],
+      "LINK": [
+        {
+          "n": 10,
+          "accuracy": {
+            "point": 0.1,
+            "lower": 0.022632,
+            "upper": 0.347745,
+            "n": 10
+          }
+        },
+        {
+          "n": 25,
+          "accuracy": {
+            "point": 0.36,
+            "lower": 0.223042,
+            "upper": 0.524306,
+            "n": 25
+          }
+        },
+        {
+          "n": 50,
+          "accuracy": {
+            "point": 0.5,
+            "lower": 0.386706,
+            "upper": 0.613294,
+            "n": 50
+          }
+        },
+        {
+          "n": 100,
+          "accuracy": {
+            "point": 0.61,
+            "lower": 0.527878,
+            "upper": 0.686326,
+            "n": 100
+          }
+        },
+        {
+          "n": 200,
+          "accuracy": {
+            "point": 0.305,
+            "lower": 0.254344,
+            "upper": 0.360862,
+            "n": 200
+          }
+        },
+        {
+          "n": 500,
+          "accuracy": {
+            "point": 0.602,
+            "lower": 0.565534,
+            "upper": 0.637368,
+            "n": 500
+          }
+        },
+        {
+          "n": 532,
+          "accuracy": {
+            "point": 0.565789,
+            "lower": 0.530195,
+            "upper": 0.600718,
+            "n": 532
+          }
+        }
+      ]
+    },
+    "stability_test": {
+      "first_500_accuracy": 0.464,
+      "rest_accuracy": 0.530098,
+      "n_first": 500,
+      "n_rest": 1628,
+      "z_statistic": -2.5866,
+      "p_value": 0.009693,
+      "is_stable": false,
+      "interpretation": "accuracy differs between early and late signals \u2014 possible drift"
+    },
+    "n": 2128
+  },
+  "signal_quality_decomposition": {
+    "quality_tiers": {
+      "GOOD": {
+        "n": 525,
+        "accuracy": {
+          "point": 0.51619,
+          "lower": 0.480321,
+          "upper": 0.551893,
+          "n": 525
+        },
+        "mean_confidence": 0.5758,
+        "mean_brier": 0.253291,
+        "total_karma": 9.7886,
+        "mean_karma": 0.018645
+      },
+      "MARGINAL": {
+        "n": 1575,
+        "accuracy": {
+          "point": 0.521905,
+          "lower": 0.50118,
+          "upper": 0.542555,
+          "n": 1575
+        },
+        "mean_confidence": 0.5152,
+        "mean_brier": 0.249565,
+        "total_karma": 35.5488,
+        "mean_karma": 0.022571
+      },
+      "UNKNOWN": {
+        "n": 28,
+        "accuracy": {
+          "point": 0.071429,
+          "lower": 0.023923,
+          "upper": 0.194471,
+          "n": 28
+        },
+        "mean_confidence": 0.11975,
+        "mean_brier": 0.068512,
+        "total_karma": -2.863,
+        "mean_karma": -0.10225
+      }
+    },
+    "n": 2128
+  },
+  "producer_reputation_score_v1": {
+    "composite_score": 0.5353,
+    "grade": "C",
+    "components": {
+      "calibration_quality": {
+        "score": 0.9995,
+        "reliability": 0.000137,
+        "weight": 0.25,
+        "interpretation": "1 - 4*reliability (perfect calibration = 1.0)"
+      },
+      "directional_accuracy": {
+        "score": 0.0728,
+        "hit_rate": {
+          "point": 0.514568,
+          "lower": 0.496738,
+          "upper": 0.53236,
+          "n": 2128
+        },
+        "weight": 0.3,
+        "interpretation": "linear scale: 50%=0.0, 70%+=1.0"
+      },
+      "abstention_discipline": {
+        "score": 1.0,
+        "no_trade_fraction": 1.0,
+        "no_trade_count": 2128,
+        "total_signals": 2128,
+        "weight": 0.15,
+        "interpretation": "fraction of signals during NO_TRADE regime state"
+      },
+      "confidence_sharpness": {
+        "score": 0.0574,
+        "forecast_variance": 0.002872,
+        "weight": 0.15,
+        "interpretation": "variance of forecasts: 0=uniform, 0.05+=sharp"
+      },
+      "karma_validation": {
+        "score": 0.7,
+        "predicted_karma": 0.0319,
+        "realized_karma": 0.02,
+        "weight": 0.15,
+        "interpretation": "agreement between predicted and realized karma"
+      }
+    },
+    "weights": {
+      "calibration_quality": 0.25,
+      "directional_accuracy": 0.3,
+      "abstention_discipline": 0.15,
+      "confidence_sharpness": 0.15,
+      "karma_validation": 0.15
+    }
+  },
+  "producer_reputation_score_v2": {
+    "composite_score": 0.5556,
+    "grade": "C",
+    "components": {
+      "calibration_quality": {
+        "score": 0.9995,
+        "reliability": 0.000137,
+        "weight": 0.2
+      },
+      "binary_accuracy": {
+        "score": 0.0728,
+        "hit_rate": {
+          "point": 0.514568,
+          "lower": 0.496738,
+          "upper": 0.53236,
+          "n": 2128
+        },
+        "weight": 0.15
+      },
+      "confidence_weighted_accuracy": {
+        "score": 0.0951,
+        "cw_accuracy": 0.519011,
+        "delta_vs_binary": 0.004444,
+        "weight": 0.2,
+        "interpretation": "tests whether high-confidence signals outperform"
+      },
+      "abstention_discipline": {
+        "score": 1.0,
+        "no_trade_fraction": 1.0,
+        "weight": 0.1
+      },
+      "confidence_sharpness": {
+        "score": 0.0574,
+        "forecast_variance": 0.002872,
+        "weight": 0.1
+      },
+      "karma_validation": {
+        "score": 0.7,
+        "predicted": 0.031936,
+        "realized": 0.01996,
+        "weight": 0.1
+      },
+      "calibration_monotonicity": {
+        "score": 1.0,
+        "is_monotonic": true,
+        "weight": 0.15,
+        "interpretation": "does accuracy increase with confidence bracket"
+      }
+    },
+    "method": "enhanced_v2_with_confidence_weighting",
+    "vs_v1": {
+      "note": "v1 used binary accuracy only; v2 adds confidence-weighted accuracy and monotonicity test",
+      "v1_composite": 0.5353
+    }
+  },
+  "limitations": [
+    {
+      "id": "RESOLUTION_GAP",
+      "description": "364 of 2492 signals (14.6%) have attribution windows extending beyond available price data. These unresolved signals are excluded from all accuracy and Brier calculations.",
+      "bias_direction": "INDETERMINATE",
+      "bias_magnitude": "small",
+      "reasoning": "Unresolved signals are the MOST RECENT ones (sent March 25-26). If recent signals perform differently from earlier ones, the resolved sample may not represent steady-state accuracy. However, the stability test across time windows can diagnose this."
+    },
+    {
+      "id": "SOL_WEAKNESS",
+      "description": "SOL accuracy (44.0%) is below coin-flip. The calibration engine correctly identified bearish direction from historical data, but this forward-test window was net bullish for SOL.",
+      "bias_direction": "PESSIMISTIC_ON_AGGREGATE",
+      "bias_magnitude": "moderate \u2014 excluding SOL raises aggregate accuracy from 51.5% to ~53.9%",
+      "reasoning": "SOL was flagged as weakest symbol in the calibration engine. This is a known limitation, not a surprise. The question is whether to continue signaling SOL or exclude it. Current policy: continue with honest limitation disclosure."
+    },
+    {
+      "id": "ACCURACY_VS_CALIBRATION_DISCONNECT",
+      "description": "Directional accuracy (51.5%) is barely above coin-flip, but calibration quality (reliability 0.000137) is near-perfect. This means the engine KNOWS it is close to a coin flip and assigns appropriately low confidence. The calibration is honest.",
+      "bias_direction": "NONE \u2014 CORRECTLY CALIBRATED",
+      "bias_magnitude": "not applicable \u2014 this is a feature, not a bug",
+      "reasoning": "The value proposition is not high directional accuracy. It is: (1) correct direction selection vs naive assumptions (+44.9% improvement), (2) honest confidence calibration, (3) transition detection and restraint. Claiming high accuracy would be dishonest. Claiming well-calibrated low-confidence edges is the truthful product description."
+    },
+    {
+      "id": "PRE_CALIBRATION_SAMPLE_SIZE",
+      "description": "Pre-calibration cohort has only n=28 signals. The +44.9% accuracy improvement is statistically significant (Fisher p=1e-6) but the pre-cal baseline is noisy.",
+      "bias_direction": "OVERSTATED_IMPROVEMENT",
+      "bias_magnitude": "small \u2014 Fisher p=1e-6 survives even with n=28 because the effect size is enormous (7.1% vs 52.0%). But the pre-cal 7.1% could be 15-20% with a larger sample, narrowing the delta.",
+      "reasoning": "Pre-calibration signals were all bearish with arbitrary low confidence. They were wrong because the market was mixed, not uniformly bearish. A random-direction pre-cal baseline would show ~50%, making the improvement ~2% not 45%."
+    },
+    {
+      "id": "SINGLE_REGIME_WINDOW",
+      "description": "The entire forward-test window (March 19-26) occurred during a SYSTEMIC regime with NO_TRADE decision. The calibration engine has not been forward-tested during NEUTRAL, EARNINGS, or DIVERGENCE regimes, which is when TRADE decisions would actually fire.",
+      "bias_direction": "UNDERSTATED_UNCERTAINTY",
+      "bias_magnitude": "potentially large \u2014 SYSTEMIC is the regime where restraint is correct and directional accuracy matters least. Performance during NEUTRAL (when TRADE signals fire) is untested.",
+      "reasoning": "This is the most important limitation. The forward-test proves calibration quality and direction selection during SYSTEMIC, but the live execution path (NEUTRAL + CRYPTO_LEADS) has zero forward-test resolution. Future regime flip is needed."
+    },
+    {
+      "id": "CONFIDENCE_WEIGHTING_DIAGNOSTIC",
+      "description": "Confidence-weighted accuracy delta is +0.004444 (positive = high-confidence signals outperform).",
+      "bias_direction": "CALIBRATION_ADDS_VALUE",
+      "bias_magnitude": "delta of 0.0044 on confidence-weighted accuracy",
+      "reasoning": "If delta is positive, the engine correctly assigns higher confidence to signals that are more likely to be correct. If near zero, confidence levels are informative for calibration but not for discrimination between better and worse signals."
+    }
+  ],
+  "unresolved_signals": {
+    "count": 364,
+    "reasons": {
+      "missing_price_data": 364
+    }
+  }
+}
