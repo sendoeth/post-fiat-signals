@@ -25067,11 +25067,25 @@
       "note": "signal integrity compromised",
       "action": "NO_TRADE",
       "horizon_hours": 336
+    },
+    {
+      "schema": "pf-performance-log/v1",
+      "cycle_key": "2026-04-05T02:30:00Z",
+      "timestamp": "2026-04-05T02:31:02Z",
+      "decision": "NO_TRADE",
+      "regime": "SYSTEMIC",
+      "regime_confidence": 77,
+      "watchdog_verdict": "STOP",
+      "signal_fidelity": "STOP",
+      "regime_confidence_verdict": "DEGRADED",
+      "note": "signal integrity compromised",
+      "action": "NO_TRADE",
+      "horizon_hours": 336
     }
   ],
   "summary": {
-    "total_entries": 1789,
-    "no_trade_count": 1789,
+    "total_entries": 1790,
+    "no_trade_count": 1790,
     "execute_count": 0,
     "evaluated_count": 0,
     "pending_count": 0,
@@ -25079,11 +25093,11 @@
     "misses": 0,
     "hit_rate": null,
     "avg_return": null,
-    "no_trade_streak": 1789,
+    "no_trade_streak": 1790,
     "regime_distribution": {
-      "SYSTEMIC": 1783,
+      "SYSTEMIC": 1784,
       "UNKNOWN": 6
     }
   },
-  "last_updated": "2026-04-05T02:16:02Z"
+  "last_updated": "2026-04-05T02:31:02Z"
 }
