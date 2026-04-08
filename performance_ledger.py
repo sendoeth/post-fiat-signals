@@ -10,7 +10,7 @@ structured entries to performance_log.json. Deduplicates via 15-min cycle
 keys. Evaluates PENDING entries past their 14-day horizon by re-fetching
 prices from CoinGecko/Yahoo.
 
-Schema: pf-performance-log/v1
+Schema: 1.0.0 (semver — canonical format across all surfaces)
 SPI-compatible fields (ticker, action, confidence, horizon_hours) included
 for direct b1e55ed adapter consumption.
 
@@ -38,7 +38,8 @@ from datetime import datetime, timezone, timedelta
 
 # ── Config ─────────────────────────────────────────────────────────────────
 
-SCHEMA = "pf-performance-log/v1"
+SCHEMA = "1.0.0"
+PRODUCER_ID = "post-fiat-signals"
 HORIZON_HOURS = 336  # 14 days
 CYCLE_INTERVAL_MIN = 15
 STALE_THRESHOLD_SEC = 300  # 5 min — re-run pipeline if output older than this
@@ -213,7 +214,7 @@ def build_no_trade_entry(pipeline, cycle_key, ts, regime_info=None):
         "signal_fidelity": watchdog.get("signal_fidelity", "UNKNOWN"),
         "regime_confidence_verdict": watchdog.get("regime_confidence", "UNKNOWN"),
         "note": overall.get("position_note", ""),
-        "action": "NO_TRADE",
+        "producer_id": PRODUCER_ID,
         "horizon_hours": HORIZON_HOURS,
     }
 
@@ -255,7 +256,7 @@ def build_execute_entry(pipeline, signal_decision, cycle_key, ts):
         "pair": pair,
         "ticker": crypto_symbol or "",
         "semi_ticker": semi_ticker or "",
-        "action": "BUY",
+        "producer_id": PRODUCER_ID,
         "signal_type": signal_decision.get("signal_type", ""),
         "confidence": hit_rate,
         "hit_rate": hit_rate,
@@ -484,7 +485,6 @@ def main():
             # Edge case: EXECUTE_REDUCED but no individual EXECUTE decisions
             entry = build_no_trade_entry(pipeline, cycle_key, ts)
             entry["decision"] = overall_decision
-            entry["action"] = overall_decision
             entries.append(entry)
             log(f"Appended {overall_decision} entry (no individual signals)")
         else:
