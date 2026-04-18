@@ -43673,11 +43673,25 @@
       "note": "signal integrity compromised",
       "producer_id": "post-fiat-signals",
       "horizon_hours": 336
+    },
+    {
+      "schema": "1.0.0",
+      "cycle_key": "2026-04-18T22:45:00Z",
+      "timestamp": "2026-04-18T22:46:01Z",
+      "decision": "NO_TRADE",
+      "regime": "SYSTEMIC",
+      "regime_confidence": 77,
+      "watchdog_verdict": "STOP",
+      "signal_fidelity": "STOP",
+      "regime_confidence_verdict": "DEGRADED",
+      "note": "signal integrity compromised",
+      "producer_id": "post-fiat-signals",
+      "horizon_hours": 336
     }
   ],
   "summary": {
-    "total_entries": 3118,
-    "no_trade_count": 3118,
+    "total_entries": 3119,
+    "no_trade_count": 3119,
     "execute_count": 0,
     "evaluated_count": 0,
     "pending_count": 0,
@@ -43685,11 +43699,11 @@
     "misses": 0,
     "hit_rate": null,
     "avg_return": null,
-    "no_trade_streak": 3118,
+    "no_trade_streak": 3119,
     "regime_distribution": {
-      "SYSTEMIC": 3112,
+      "SYSTEMIC": 3113,
       "UNKNOWN": 6
     }
   },
-  "last_updated": "2026-04-18T22:31:01Z"
+  "last_updated": "2026-04-18T22:46:01Z"
 }
