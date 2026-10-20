@@ -13,6 +13,8 @@ STATUS_FILE="$REPO_DIR/status.json"
 LOG_PREFIX="[$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
 
 cd "$REPO_DIR"
+source "$REPO_DIR/git_sync.sh"
+pf_lock
 
 # Capture previous state fingerprint (overall + component states)
 OLD_FINGERPRINT=""
@@ -53,23 +55,9 @@ if git diff --quiet "$STATUS_FILE" 2>/dev/null; then
     exit 0
 fi
 
-# Commit and push
-git add "$STATUS_FILE"
-git commit -m "Auto-update status.json — $(python3 -c "
-import json
-d = json.load(open('$STATUS_FILE'))
-print(d.get('overall_health', 'UNKNOWN'))
-") $(date -u +%Y-%m-%dT%H:%M:%SZ)" --no-gpg-sign 2>&1 | while read line; do echo "$LOG_PREFIX $line"; done
-
-# Token read from file outside repo — never committed
-GITHUB_TOKEN=$(cat /home/postfiat/.github_token 2>/dev/null || echo "")
-if [ -z "$GITHUB_TOKEN" ]; then
-    echo "$LOG_PREFIX ERROR: No token found at /home/postfiat/.github_token — cannot push"
-    exit 1
-fi
-git push "https://${GITHUB_TOKEN}@github.com/sendoeth/post-fiat-signals.git" main 2>&1 | while read line; do echo "$LOG_PREFIX $line"; done
-
-echo "$LOG_PREFIX Pushed updated status.json (overall: $NEW_FINGERPRINT)"
+# Commit and push (shared lock, rebase, real failure reporting)
+OVERALL=$(python3 -c "import json; print(json.load(open('$STATUS_FILE')).get('overall_health', 'UNKNOWN'))")
+pf_commit_push "$STATUS_FILE" "Auto-update status.json — $OVERALL $(date -u +%Y-%m-%dT%H:%M:%SZ)" || exit 1
 
 if [ "$OLD_FINGERPRINT" != "$NEW_FINGERPRINT" ]; then
     echo "$LOG_PREFIX STATE CHANGE: $OLD_FINGERPRINT -> $NEW_FINGERPRINT"

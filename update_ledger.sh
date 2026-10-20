@@ -13,6 +13,8 @@ LEDGER_FILE="$REPO_DIR/performance_log.json"
 LOG_PREFIX="[$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
 
 cd "$REPO_DIR"
+source "$REPO_DIR/git_sync.sh"
+pf_lock
 
 export PF_API_URL="http://localhost:8080"
 
@@ -30,14 +32,4 @@ if git diff --quiet "$LEDGER_FILE" 2>/dev/null && ! git ls-files --others --excl
     exit 0
 fi
 
-git add "$LEDGER_FILE"
-git commit -m "Auto-update performance_log.json $(date -u +%Y-%m-%dT%H:%M:%SZ)" --no-gpg-sign 2>&1 | while read line; do echo "$LOG_PREFIX $line"; done
-
-GITHUB_TOKEN=$(cat /home/postfiat/.github_token 2>/dev/null || echo "")
-if [ -z "$GITHUB_TOKEN" ]; then
-    echo "$LOG_PREFIX ERROR: No token found at /home/postfiat/.github_token — cannot push"
-    exit 1
-fi
-git push "https://${GITHUB_TOKEN}@github.com/sendoeth/post-fiat-signals.git" main 2>&1 | while read line; do echo "$LOG_PREFIX $line"; done
-
-echo "$LOG_PREFIX Pushed updated performance_log.json"
+pf_commit_push "$LEDGER_FILE" "Auto-update performance_log.json $(date -u +%Y-%m-%dT%H:%M:%SZ)" || exit 1
