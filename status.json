@@ -1,8 +1,8 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-10-20T22:45:01Z",
+  "generated_at": "2026-10-20T23:00:01Z",
   "overall_health": "HALT",
-  "summary": "The Signal Intelligence API is currently unreachable. This means health checks cannot be performed and signals are unavailable. Error: RetryExhaustedError: All 3 attempts failed for /regime/current",
+  "summary": "The Signal Intelligence API is currently unreachable. This means health checks cannot be performed and signals are unavailable. Error: ConnectionError: Health check failed: [Errno 111] Connection refused",
   "components": {
     "regime_engine": {
       "state": "HALT",
@@ -16,7 +16,7 @@
     },
     "circuit_breaker": {
       "state": "HALT",
-      "message": "API unreachable: RetryExhaustedError: All 3 attempts failed for /regime/current",
+      "message": "API unreachable: ConnectionError: Health check failed: [Errno 111] Connection refused",
       "details": {
         "api_status": "unreachable"
       }
