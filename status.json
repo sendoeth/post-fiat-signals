@@ -1,77 +1,24 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-10-20T22:30:01Z",
+  "generated_at": "2026-10-20T22:45:01Z",
   "overall_health": "HALT",
-  "summary": "Signal integrity issue detected in: granger_pipeline. This is a safe halt \u2014 the system is correctly preventing reliance on potentially unreliable signals. This does NOT mean the infrastructure is broken. It means current market conditions or data quality do not meet the thresholds required for confident signal generation. Check component messages for details.",
+  "summary": "The Signal Intelligence API is currently unreachable. This means health checks cannot be performed and signals are unavailable. Error: RetryExhaustedError: All 3 attempts failed for /regime/current",
   "components": {
     "regime_engine": {
-      "state": "DEGRADED",
-      "message": "Regime classifier confidence is 35%, below the 50% threshold. Classification may be unreliable. Regime alert is active, indicating the market regime may be shifting. Signal classifications should be treated with extra caution.",
-      "details": {
-        "regime": "EARNINGS",
-        "regime_label": "Earnings / Rotation",
-        "confidence": 35,
-        "is_alert": true,
-        "regime_implication": "EARNINGS regime is active. Signal reliability varies by type \u2014 check the filtered signals endpoint for per-signal classifications.",
-        "actionable_signals": 0,
-        "suppressed_signals": 0,
-        "total_signals": 3
-      }
+      "state": "HALT",
+      "message": "Cannot evaluate \u2014 API unreachable.",
+      "details": {}
     },
     "granger_pipeline": {
       "state": "HALT",
-      "message": "2 of 3 signal types are decaying (CRYPTO_LEADS, FULL_DECOUPLE). This means the historical correlations that power the trading signals have weakened significantly. The system is correctly halting to prevent trades based on unreliable statistical relationships. CRYPTO_LEADS has dropped 20.7% from its all-time score. The primary signal is weakening \u2014 reduce position sizes. Regime alert triggered \u2014 multiple signal types decaying simultaneously suggests a structural shift in market correlations.",
-      "details": {
-        "signal_types": {
-          "SEMI_LEADS": {
-            "label": "Semi Leads",
-            "score": 77,
-            "all_time_score": 77,
-            "current_rolling": 79,
-            "drop_pct": -2.6,
-            "is_decaying": false,
-            "freshness": "Fresh"
-          },
-          "CRYPTO_LEADS": {
-            "label": "Crypto Leads",
-            "score": 87,
-            "all_time_score": 87,
-            "current_rolling": 69,
-            "drop_pct": 20.7,
-            "is_decaying": true,
-            "freshness": "Stale"
-          },
-          "FULL_DECOUPLE": {
-            "label": "Full Decouple",
-            "score": 85,
-            "all_time_score": 85,
-            "current_rolling": 59,
-            "drop_pct": 30.6,
-            "is_decaying": true,
-            "freshness": "Stale"
-          }
-        },
-        "decaying_count": 2,
-        "decaying_types": [
-          "CRYPTO_LEADS",
-          "FULL_DECOUPLE"
-        ],
-        "primary_signal_drop": 20.7,
-        "primary_signal_freshness": "Stale",
-        "regime_alert": true
-      }
+      "message": "Cannot evaluate \u2014 API unreachable.",
+      "details": {}
     },
     "circuit_breaker": {
-      "state": "HEALTHY",
-      "message": "Circuit breaker is operational. API is responding, data is fresh, and no errors have been recorded.",
+      "state": "HALT",
+      "message": "API unreachable: RetryExhaustedError: All 3 attempts failed for /regime/current",
       "details": {
-        "api_status": "ok",
-        "uptime_seconds": 28545,
-        "data_age_seconds": 631,
-        "is_stale": false,
-        "last_error": null,
-        "refresh_count": 32,
-        "schema_version": "1.1.0"
+        "api_status": "unreachable"
       }
     }
   },
