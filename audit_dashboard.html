@@ -722,7 +722,7 @@ const API_BASE = (function() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('api')) return params.get('api').replace(/\/$/, '');
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return 'http://localhost:8080';
-  return 'http://84.32.34.46:8080';
+  return 'http://<signal-api-host>:8080';
 })();
 const POLL_INTERVAL_MS = 60000;
 const FETCH_TIMEOUT_MS = 12000;
