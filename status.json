@@ -1,34 +1,34 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-10-21T22:30:01Z",
+  "generated_at": "2026-10-21T22:45:02Z",
   "overall_health": "HALT",
   "summary": "Signal integrity issue detected in: granger_pipeline. This is a safe halt \u2014 the system is correctly preventing reliance on potentially unreliable signals. This does NOT mean the infrastructure is broken. It means current market conditions or data quality do not meet the thresholds required for confident signal generation. Check component messages for details.",
   "components": {
     "regime_engine": {
       "state": "DEGRADED",
-      "message": "Regime classifier confidence is 33%, below the 50% threshold. Classification may be unreliable. Regime alert is active, indicating the market regime may be shifting. Signal classifications should be treated with extra caution.",
+      "message": "Regime classifier confidence is 44%, below the 50% threshold. Classification may be unreliable. Regime alert is active, indicating the market regime may be shifting. Signal classifications should be treated with extra caution.",
       "details": {
         "regime": "EARNINGS",
         "regime_label": "Earnings / Rotation",
-        "confidence": 33,
+        "confidence": 44,
         "is_alert": true,
         "regime_implication": "EARNINGS regime is active. Signal reliability varies by type \u2014 check the filtered signals endpoint for per-signal classifications.",
         "actionable_signals": 0,
         "suppressed_signals": 0,
-        "total_signals": 2
+        "total_signals": 1
       }
     },
     "granger_pipeline": {
       "state": "HALT",
-      "message": "2 of 3 signal types are decaying (CRYPTO_LEADS, FULL_DECOUPLE). This means the historical correlations that power the trading signals have weakened significantly. The system is correctly halting to prevent trades based on unreliable statistical relationships. CRYPTO_LEADS has dropped 20.7% from its all-time score. The primary signal is weakening \u2014 reduce position sizes. Regime alert triggered \u2014 multiple signal types decaying simultaneously suggests a structural shift in market correlations.",
+      "message": "2 of 3 signal types are decaying (CRYPTO_LEADS, FULL_DECOUPLE). This means the historical correlations that power the trading signals have weakened significantly. The system is correctly halting to prevent trades based on unreliable statistical relationships. CRYPTO_LEADS has dropped 28.7% from its all-time score. The primary signal is weakening \u2014 reduce position sizes. Regime alert triggered \u2014 multiple signal types decaying simultaneously suggests a structural shift in market correlations.",
       "details": {
         "signal_types": {
           "SEMI_LEADS": {
             "label": "Semi Leads",
             "score": 77,
             "all_time_score": 77,
-            "current_rolling": 79,
-            "drop_pct": -2.6,
+            "current_rolling": 76,
+            "drop_pct": 1.3,
             "is_decaying": false,
             "freshness": "Fresh"
           },
@@ -36,8 +36,8 @@
             "label": "Crypto Leads",
             "score": 87,
             "all_time_score": 87,
-            "current_rolling": 69,
-            "drop_pct": 20.7,
+            "current_rolling": 62,
+            "drop_pct": 28.7,
             "is_decaying": true,
             "freshness": "Stale"
           },
@@ -45,8 +45,8 @@
             "label": "Full Decouple",
             "score": 85,
             "all_time_score": 85,
-            "current_rolling": 67,
-            "drop_pct": 21.2,
+            "current_rolling": 41,
+            "drop_pct": 51.8,
             "is_decaying": true,
             "freshness": "Stale"
           }
@@ -56,7 +56,7 @@
           "CRYPTO_LEADS",
           "FULL_DECOUPLE"
         ],
-        "primary_signal_drop": 20.7,
+        "primary_signal_drop": 28.7,
         "primary_signal_freshness": "Stale",
         "regime_alert": true
       }
@@ -66,11 +66,11 @@
       "message": "Circuit breaker is operational. API is responding, data is fresh, and no errors have been recorded.",
       "details": {
         "api_status": "ok",
-        "uptime_seconds": 20604,
+        "uptime_seconds": 21505,
         "data_age_seconds": 794,
         "is_stale": false,
         "last_error": null,
-        "refresh_count": 23,
+        "refresh_count": 24,
         "schema_version": "1.1.0"
       }
     }
