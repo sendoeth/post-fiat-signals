@@ -1,16 +1,16 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-10-23T22:30:01Z",
+  "generated_at": "2026-10-23T22:45:01Z",
   "overall_health": "HALT",
   "summary": "Signal integrity issue detected in: granger_pipeline. This is a safe halt \u2014 the system is correctly preventing reliance on potentially unreliable signals. This does NOT mean the infrastructure is broken. It means current market conditions or data quality do not meet the thresholds required for confident signal generation. Check component messages for details.",
   "components": {
     "regime_engine": {
       "state": "DEGRADED",
-      "message": "Regime classifier confidence is 44%, below the 50% threshold. Classification may be unreliable. Regime alert is active, indicating the market regime may be shifting. Signal classifications should be treated with extra caution.",
+      "message": "Regime classifier confidence is 38%, below the 50% threshold. Classification may be unreliable. Regime alert is active, indicating the market regime may be shifting. Signal classifications should be treated with extra caution.",
       "details": {
         "regime": "EARNINGS",
         "regime_label": "Earnings / Rotation",
-        "confidence": 44,
+        "confidence": 38,
         "is_alert": true,
         "regime_implication": "EARNINGS regime is active. Signal reliability varies by type \u2014 check the filtered signals endpoint for per-signal classifications.",
         "actionable_signals": 0,
@@ -45,8 +45,8 @@
             "label": "Full Decouple",
             "score": 85,
             "all_time_score": 85,
-            "current_rolling": 41,
-            "drop_pct": 51.8,
+            "current_rolling": 59,
+            "drop_pct": 30.6,
             "is_decaying": true,
             "freshness": "Stale"
           }
@@ -66,11 +66,11 @@
       "message": "Circuit breaker is operational. API is responding, data is fresh, and no errors have been recorded.",
       "details": {
         "api_status": "ok",
-        "uptime_seconds": 193405,
+        "uptime_seconds": 194304,
         "data_age_seconds": 792,
         "is_stale": false,
         "last_error": null,
-        "refresh_count": 215,
+        "refresh_count": 216,
         "schema_version": "1.1.0"
       }
     }
