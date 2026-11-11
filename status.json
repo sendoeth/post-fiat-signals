@@ -1,6 +1,6 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-11-11T22:30:01Z",
+  "generated_at": "2026-11-11T22:45:01Z",
   "overall_health": "HALT",
   "summary": "Signal integrity issue detected in: granger_pipeline. This is a safe halt \u2014 the system is correctly preventing reliance on potentially unreliable signals. This does NOT mean the infrastructure is broken. It means current market conditions or data quality do not meet the thresholds required for confident signal generation. Check component messages for details.",
   "components": {
@@ -8,45 +8,45 @@
       "state": "DEGRADED",
       "message": "Regime alert is active, indicating the market regime may be shifting. Signal classifications should be treated with extra caution.",
       "details": {
-        "regime": "EARNINGS",
-        "regime_label": "Earnings / Rotation",
-        "confidence": 67,
+        "regime": "SYSTEMIC",
+        "regime_label": "Systemic Risk-Off",
+        "confidence": 65,
         "is_alert": true,
-        "regime_implication": "EARNINGS regime is active. Signal reliability varies by type \u2014 check the filtered signals endpoint for per-signal classifications.",
+        "regime_implication": "SYSTEMIC regime is active. All signal types are suppressed by the regime filter. This is expected behavior during broad market stress \u2014 the system is correctly blocking trades that historically lose money in this environment.",
         "actionable_signals": 0,
-        "suppressed_signals": 0,
-        "total_signals": 6
+        "suppressed_signals": 9,
+        "total_signals": 9
       }
     },
     "granger_pipeline": {
       "state": "HALT",
-      "message": "3 of 3 signal types are decaying (SEMI_LEADS, CRYPTO_LEADS, FULL_DECOUPLE). This means the historical correlations that power the trading signals have weakened significantly. The system is correctly halting to prevent trades based on unreliable statistical relationships. CRYPTO_LEADS (the primary tradeable signal) has dropped 52.9% from its all-time score. This exceeds the 40% halt threshold. The semi-to-crypto lead-lag relationship that underpins the core trading edge may no longer be intact. Regime alert triggered \u2014 multiple signal types decaying simultaneously suggests a structural shift in market correlations.",
+      "message": "3 of 3 signal types are decaying (SEMI_LEADS, CRYPTO_LEADS, FULL_DECOUPLE). This means the historical correlations that power the trading signals have weakened significantly. The system is correctly halting to prevent trades based on unreliable statistical relationships. CRYPTO_LEADS (the primary tradeable signal) has dropped 51.8% from its all-time score. This exceeds the 40% halt threshold. The semi-to-crypto lead-lag relationship that underpins the core trading edge may no longer be intact. Regime alert triggered \u2014 multiple signal types decaying simultaneously suggests a structural shift in market correlations.",
       "details": {
         "signal_types": {
           "SEMI_LEADS": {
             "label": "Semi Leads",
-            "score": 76,
-            "all_time_score": 76,
-            "current_rolling": 24,
-            "drop_pct": 68.4,
+            "score": 74,
+            "all_time_score": 74,
+            "current_rolling": 33,
+            "drop_pct": 55.4,
             "is_decaying": true,
             "freshness": "Stale"
           },
           "CRYPTO_LEADS": {
             "label": "Crypto Leads",
-            "score": 87,
-            "all_time_score": 87,
+            "score": 85,
+            "all_time_score": 85,
             "current_rolling": 41,
-            "drop_pct": 52.9,
+            "drop_pct": 51.8,
             "is_decaying": true,
             "freshness": "Stale"
           },
           "FULL_DECOUPLE": {
             "label": "Full Decouple",
-            "score": 83,
-            "all_time_score": 83,
-            "current_rolling": 30,
-            "drop_pct": 63.9,
+            "score": 84,
+            "all_time_score": 84,
+            "current_rolling": 27,
+            "drop_pct": 67.9,
             "is_decaying": true,
             "freshness": "Stale"
           }
@@ -57,7 +57,7 @@
           "CRYPTO_LEADS",
           "FULL_DECOUPLE"
         ],
-        "primary_signal_drop": 52.9,
+        "primary_signal_drop": 51.8,
         "primary_signal_freshness": "Stale",
         "regime_alert": true
       }
@@ -67,11 +67,11 @@
       "message": "Circuit breaker is operational. API is responding, data is fresh, and no errors have been recorded.",
       "details": {
         "api_status": "ok",
-        "uptime_seconds": 1069735,
-        "data_age_seconds": 509,
+        "uptime_seconds": 1070635,
+        "data_age_seconds": 508,
         "is_stale": false,
         "last_error": null,
-        "refresh_count": 1189,
+        "refresh_count": 1190,
         "schema_version": "1.1.0"
       }
     }
