@@ -1,6 +1,6 @@
 {
   "schema": "pf-system-status/v1",
-  "generated_at": "2026-11-25T22:30:01Z",
+  "generated_at": "2026-11-25T22:45:01Z",
   "overall_health": "HALT",
   "summary": "Signal integrity issue detected in: granger_pipeline. This is a safe halt \u2014 the system is correctly preventing reliance on potentially unreliable signals. This does NOT mean the infrastructure is broken. It means current market conditions or data quality do not meet the thresholds required for confident signal generation. Check component messages for details.",
   "components": {
@@ -10,12 +10,12 @@
       "details": {
         "regime": "SYSTEMIC",
         "regime_label": "Systemic Risk-Off",
-        "confidence": 66,
+        "confidence": 65,
         "is_alert": true,
         "regime_implication": "SYSTEMIC regime is active. All signal types are suppressed by the regime filter. This is expected behavior during broad market stress \u2014 the system is correctly blocking trades that historically lose money in this environment.",
         "actionable_signals": 0,
-        "suppressed_signals": 13,
-        "total_signals": 13
+        "suppressed_signals": 14,
+        "total_signals": 14
       }
     },
     "granger_pipeline": {
@@ -25,10 +25,10 @@
         "signal_types": {
           "SEMI_LEADS": {
             "label": "Semi Leads",
-            "score": 73,
-            "all_time_score": 73,
-            "current_rolling": 36,
-            "drop_pct": 50.7,
+            "score": 72,
+            "all_time_score": 72,
+            "current_rolling": 39,
+            "drop_pct": 45.8,
             "is_decaying": true,
             "freshness": "Stale"
           },
@@ -67,11 +67,11 @@
       "message": "Circuit breaker is operational. API is responding, data is fresh, and no errors have been recorded.",
       "details": {
         "api_status": "ok",
-        "uptime_seconds": 2279335,
+        "uptime_seconds": 2280235,
         "data_age_seconds": 493,
         "is_stale": false,
         "last_error": null,
-        "refresh_count": 2533,
+        "refresh_count": 2534,
         "schema_version": "1.1.0"
       }
     }
